@@ -5,10 +5,28 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"sync"
+	"strings"
 	"time"
 
 	"eve-profit2/internal/models"
+)
+
+// HTTP Header constants to prevent string duplication
+const (
+	HeaderUserAgent   = "User-Agent"
+	HeaderContentType = "Content-Type"
+	HeaderAccept      = "Accept"
+
+	// Content types
+	ContentTypeJSON = "application/json"
+
+	// User agent
+	UserAgentValue = "EVE-Profit2/1.0"
+
+	// Error message templates
+	ErrCreateRequest  = "failed to create request: %w"
+	ErrRequestFailed  = "request failed: %w"
+	ErrDecodeResponse = "failed to decode response: %w"
 )
 
 // ESIClient handles communication with EVE ESI API
@@ -18,7 +36,6 @@ type ESIClient struct {
 	rateLimit   int
 	retryLimit  int
 	rateLimiter chan struct{}
-	rateMutex   sync.Mutex
 }
 
 // ClientOption configures the ESI client
@@ -49,15 +66,12 @@ func (c *ESIClient) initRateLimiter() {
 	ticker := time.NewTicker(time.Second / time.Duration(c.rateLimit))
 	defer ticker.Stop()
 
-	for {
+	for range ticker.C {
 		select {
-		case <-ticker.C:
-			select {
-			case c.rateLimiter <- struct{}{}:
-				// Token added
-			default:
-				// Channel full, skip
-			}
+		case c.rateLimiter <- struct{}{}:
+			// Token added
+		default:
+			// Channel full, skip
 		}
 	}
 }
@@ -86,151 +100,118 @@ func WithRetryAttempts(attempts int) ClientOption {
 
 // GetMarketOrders retrieves market orders for a specific region and type
 func (c *ESIClient) GetMarketOrders(ctx context.Context, regionID int32, typeID int32) ([]models.MarketOrder, error) {
-	// Wait for rate limit token
-	select {
-	case <-c.rateLimiter:
-		// Got token, proceed
-	case <-ctx.Done():
-		return nil, ctx.Err()
+	if err := c.waitForRateLimit(ctx); err != nil {
+		return nil, err
 	}
 
-	// Build URL with query parameters
 	url := fmt.Sprintf("%s/v1/markets/%d/orders/?type_id=%d", c.baseURL, regionID, typeID)
 
+	var orders []models.MarketOrder
+	err := c.executeWithRetry(ctx, url, &orders)
+	return orders, err
+}
+
+// waitForRateLimit waits for a rate limiter token
+func (c *ESIClient) waitForRateLimit(ctx context.Context) error {
+	select {
+	case <-c.rateLimiter:
+		return nil
+	case <-ctx.Done():
+		return ctx.Err()
+	}
+}
+
+// executeWithRetry performs HTTP request with retry logic
+func (c *ESIClient) executeWithRetry(ctx context.Context, url string, result interface{}) error {
 	var lastErr error
 
-	// Retry logic
 	for attempt := 0; attempt <= c.retryLimit; attempt++ {
-		// Create request
-		req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
-		if err != nil {
-			return nil, fmt.Errorf("failed to create request: %w", err)
-		}
-
-		// Set headers
-		req.Header.Set("User-Agent", "EVE-Profit2/1.0")
-		req.Header.Set("Accept", "application/json")
-
-		// Execute request
-		resp, err := c.httpClient.Do(req)
-		if err != nil {
-			lastErr = fmt.Errorf("request failed: %w", err)
-			if attempt < c.retryLimit {
-				continue // Retry on network errors
+		if err := c.performRequest(ctx, url, result); err != nil {
+			lastErr = err
+			if c.shouldRetry(err) && attempt < c.retryLimit {
+				continue
 			}
-			return nil, lastErr
+			return lastErr
 		}
-		defer resp.Body.Close()
+		return nil
+	}
+	return lastErr
+}
 
-		// Handle HTTP errors
-		if resp.StatusCode >= 500 {
-			lastErr = fmt.Errorf("ESI server error: status %d", resp.StatusCode)
-			if attempt < c.retryLimit {
-				continue // Retry on server errors
-			}
-			return nil, lastErr
-		}
-
-		if resp.StatusCode >= 400 {
-			return nil, fmt.Errorf("ESI client error: status %d", resp.StatusCode)
-		}
-
-		// Parse response
-		var orders []models.MarketOrder
-		if err := json.NewDecoder(resp.Body).Decode(&orders); err != nil {
-			return nil, fmt.Errorf("failed to decode response: %w", err)
-		}
-
-		return orders, nil
+// performRequest performs a single HTTP request
+func (c *ESIClient) performRequest(ctx context.Context, url string, result interface{}) error {
+	req, err := c.createRequest(ctx, url)
+	if err != nil {
+		return err
 	}
 
-	return nil, lastErr
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return fmt.Errorf(ErrRequestFailed, err)
+	}
+	defer resp.Body.Close()
+
+	if err := c.handleHTTPError(resp); err != nil {
+		return err
+	}
+
+	return json.NewDecoder(resp.Body).Decode(result)
+}
+
+// createRequest creates a properly configured HTTP request
+func (c *ESIClient) createRequest(ctx context.Context, url string) (*http.Request, error) {
+	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
+	if err != nil {
+		return nil, fmt.Errorf(ErrCreateRequest, err)
+	}
+
+	req.Header.Set(HeaderUserAgent, UserAgentValue)
+	req.Header.Set(HeaderAccept, ContentTypeJSON)
+	return req, nil
+}
+
+// handleHTTPError checks HTTP status and returns appropriate error
+func (c *ESIClient) handleHTTPError(resp *http.Response) error {
+	if resp.StatusCode >= 500 {
+		return fmt.Errorf("ESI server error: status %d", resp.StatusCode)
+	}
+	if resp.StatusCode >= 400 {
+		return fmt.Errorf("ESI client error: status %d", resp.StatusCode)
+	}
+	return nil
+}
+
+// shouldRetry determines if an error should trigger a retry
+func (c *ESIClient) shouldRetry(err error) bool {
+	return strings.Contains(err.Error(), "ESI server error") ||
+		strings.Contains(err.Error(), ErrRequestFailed)
 }
 
 // GetMarketHistory retrieves market history for a specific region and type
 func (c *ESIClient) GetMarketHistory(ctx context.Context, regionID int32, typeID int32) ([]models.MarketHistory, error) {
-	// Wait for rate limit token
-	select {
-	case <-c.rateLimiter:
-		// Got token, proceed
-	case <-ctx.Done():
-		return nil, ctx.Err()
+	if err := c.waitForRateLimit(ctx); err != nil {
+		return nil, err
 	}
 
-	// Build URL with query parameters
 	url := fmt.Sprintf("%s/v1/markets/%d/history/?type_id=%d", c.baseURL, regionID, typeID)
 
-	// Create request
-	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create request: %w", err)
-	}
-
-	// Set headers
-	req.Header.Set("User-Agent", "EVE-Profit2/1.0")
-	req.Header.Set("Accept", "application/json")
-
-	// Execute request
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("request failed: %w", err)
-	}
-	defer resp.Body.Close()
-
-	// Handle HTTP errors
-	if resp.StatusCode >= 400 {
-		return nil, fmt.Errorf("ESI error: status %d", resp.StatusCode)
-	}
-
-	// Parse response
 	var history []models.MarketHistory
-	if err := json.NewDecoder(resp.Body).Decode(&history); err != nil {
-		return nil, fmt.Errorf("failed to decode response: %w", err)
-	}
-
-	return history, nil
+	err := c.executeWithRetry(ctx, url, &history)
+	return history, err
 }
 
 // GetTypeInfo retrieves type information from ESI
 func (c *ESIClient) GetTypeInfo(ctx context.Context, typeID int32) (*models.TypeInfo, error) {
-	// Wait for rate limit token
-	select {
-	case <-c.rateLimiter:
-		// Got token, proceed
-	case <-ctx.Done():
-		return nil, ctx.Err()
+	if err := c.waitForRateLimit(ctx); err != nil {
+		return nil, err
 	}
 
-	// Build URL
 	url := fmt.Sprintf("%s/v3/universe/types/%d/", c.baseURL, typeID)
 
-	// Create request
-	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create request: %w", err)
-	}
-
-	// Set headers
-	req.Header.Set("User-Agent", "EVE-Profit2/1.0")
-	req.Header.Set("Accept", "application/json")
-
-	// Execute request
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("request failed: %w", err)
-	}
-	defer resp.Body.Close()
-
-	// Handle HTTP errors
-	if resp.StatusCode >= 400 {
-		return nil, fmt.Errorf("ESI client error: status %d", resp.StatusCode)
-	}
-
-	// Parse response
 	var typeInfo models.TypeInfo
-	if err := json.NewDecoder(resp.Body).Decode(&typeInfo); err != nil {
-		return nil, fmt.Errorf("failed to decode response: %w", err)
+	err := c.executeWithRetry(ctx, url, &typeInfo)
+	if err != nil {
+		return nil, err
 	}
-
 	return &typeInfo, nil
 }

@@ -9,8 +9,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// TestItemService_GetItemByID tests the item service with real SDE data
-func TestItemService_GetItemByID(t *testing.T) {
+// TestItemServiceGetItemByID tests the item service with real SDE data
+func TestItemServiceGetItemByID(t *testing.T) {
 	// Given: Real SDE repository and item service
 	sdeRepo, err := repository.NewSDERepository("../../data/sqlite-latest.sqlite")
 	require.NoError(t, err)
@@ -40,8 +40,8 @@ func TestItemService_GetItemByID(t *testing.T) {
 	})
 }
 
-// TestItemService_SearchItems tests item search functionality
-func TestItemService_SearchItems(t *testing.T) {
+// TestItemServiceSearchItems tests item search functionality
+func TestItemServiceSearchItems(t *testing.T) {
 	// Given: Item service with SDE
 	sdeRepo, err := repository.NewSDERepository("../../data/sqlite-latest.sqlite")
 	require.NoError(t, err)

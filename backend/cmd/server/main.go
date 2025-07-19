@@ -40,7 +40,7 @@ func main() {
 
 	// Initialize services
 	itemService := service.NewItemService(sdeRepo, nil)
-	_ = service.NewMarketService(esiClient) // TODO: Use in handlers
+	marketService := service.NewMarketService(esiClient)
 
 	// Setup Gin router
 	if !cfg.DebugMode {
@@ -133,6 +133,8 @@ func main() {
 
 		// Auth placeholder
 		api.GET("/auth/login", func(c *gin.Context) {
+			// Placeholder usage to prevent unused variable warning
+			_ = marketService
 			c.JSON(http.StatusOK, gin.H{
 				"message":   "EVE SSO authentication endpoint",
 				"client_id": cfg.ESIClientID,

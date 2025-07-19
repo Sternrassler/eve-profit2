@@ -31,8 +31,8 @@ func (m *MockESIClient) GetTypeInfo(ctx context.Context, typeID int32) (*models.
 	return args.Get(0).(*models.TypeInfo), args.Error(1)
 }
 
-// TestMarketService_GetMarketData tests comprehensive market data retrieval
-func TestMarketService_GetMarketData(t *testing.T) {
+// TestMarketServiceGetMarketData tests comprehensive market data retrieval
+func TestMarketServiceGetMarketData(t *testing.T) {
 	t.Run("should aggregate market data for multiple types", func(t *testing.T) {
 		// Given: Mock ESI client with test data
 		mockClient := new(MockESIClient)
@@ -143,8 +143,8 @@ func TestMarketService_GetMarketData(t *testing.T) {
 	})
 }
 
-// TestMarketService_CalculateItemPrice tests price calculation logic
-func TestMarketService_CalculateItemPrice(t *testing.T) {
+// TestMarketServiceCalculateItemPrice tests price calculation logic
+func TestMarketServiceCalculateItemPrice(t *testing.T) {
 	t.Run("should calculate correct buy and sell prices", func(t *testing.T) {
 		// Given: Market service and test orders
 		mockClient := new(MockESIClient)

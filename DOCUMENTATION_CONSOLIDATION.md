@@ -30,7 +30,16 @@
 - **`SDE_INTEGRATION_SPECS.md`** → Wichtige Details in `STATUS.md` integriert
 - **`ESI_INTEGRATION.md`** → Konfiguration in `STATUS.md` übernommen
 
-**Begründung:** Diese Dateien enthielten zu 80% redundante Informationen, die bereits in STATUS.md vorhanden waren.
+### Clean Code: Tote Dateien entfernt:
+- **`CHECKPOINT_PHASE3.md`** → Komplett leer, keine Informationen
+- **`DEVELOPMENT_CHECKPOINT.md`** → Komplett leer, keine Informationen
+- **`ESI_INTEGRATION.md`** → Komplett leer, keine Informationen
+- **`backend/cmd/server/main_fixed.go`** → Leer, verursachte Compiler-Duplikations-Fehler
+- **`backend/cmd/server/main_simple.go`** → Leer, verursachte Compiler-Duplikations-Fehler  
+- **`backend/internal/service/market_service.go`** → Leer, verursachte Service-Duplikations-Fehler
+- **`backend/internal/service/services_new.go`** → Leer, verursachte Service-Duplikations-Fehler
+
+**Begründung:** Diese Dateien enthielten zu 80% redundante Informationen, die bereits in STATUS.md vorhanden waren. Die Checkpoint-Dateien waren komplett leer und verstießen gegen Clean Code Prinzipien.
 
 ## 🎯 Neue klare Zuständigkeiten
 
@@ -56,10 +65,11 @@
 - **Veraltete Informationen** in mehreren Dateien
 
 ### Nachher (Konsolidiert)
-- **6 Kern-Dokumentations-Dateien** mit klaren Zwecken  
+- **4 Kern-Dokumentations-Dateien** mit klaren Zwecken  
 - **~1400 Zeilen** ohne Redundanz
 - **Klare Single-Source-of-Truth** (STATUS.md)
 - **Aktuelle, konsistente Informationen**
+- **Keine toten/leeren Dateien** (Clean Code konform)
 
 ## 🚀 Vorteile der Konsolidierung
 

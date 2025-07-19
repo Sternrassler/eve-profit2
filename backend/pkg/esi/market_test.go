@@ -13,8 +13,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// TestESIClient_GetMarketHistory tests retrieving market history from ESI
-func TestESIClient_GetMarketHistory(t *testing.T) {
+// Test constants following Clean Code principles
+const (
+	testContentTypeHeader = "Content-Type"
+	testJSONContentType   = "application/json"
+)
+
+// TestESIClientGetMarketHistory tests retrieving market history from ESI
+func TestESIClientGetMarketHistory(t *testing.T) {
 	t.Run("should retrieve market history for valid region and type", func(t *testing.T) {
 		// Given: Mock ESI server responding with market history
 		mockResponse := []models.MarketHistory{
@@ -34,7 +40,7 @@ func TestESIClient_GetMarketHistory(t *testing.T) {
 			assert.Equal(t, expectedPath, r.URL.Path)
 			assert.Equal(t, "type_id=34", r.URL.RawQuery)
 
-			w.Header().Set("Content-Type", "application/json")
+			w.Header().Set(testContentTypeHeader, testJSONContentType)
 			json.NewEncoder(w).Encode(mockResponse)
 		}))
 		defer server.Close()
@@ -56,7 +62,7 @@ func TestESIClient_GetMarketHistory(t *testing.T) {
 	t.Run("should handle empty market history gracefully", func(t *testing.T) {
 		// Given: ESI server returning empty history
 		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Set("Content-Type", "application/json")
+			w.Header().Set(testContentTypeHeader, testJSONContentType)
 			w.Write([]byte(`[]`))
 		}))
 		defer server.Close()
@@ -73,8 +79,8 @@ func TestESIClient_GetMarketHistory(t *testing.T) {
 	})
 }
 
-// TestESIClient_GetTypeInfo tests retrieving type information from ESI
-func TestESIClient_GetTypeInfo(t *testing.T) {
+// TestESIClientGetTypeInfo tests retrieving type information from ESI
+func TestESIClientGetTypeInfo(t *testing.T) {
 	t.Run("should retrieve type information for valid type ID", func(t *testing.T) {
 		// Given: Mock ESI server responding with type info
 		mockResponse := models.TypeInfo{
@@ -91,7 +97,7 @@ func TestESIClient_GetTypeInfo(t *testing.T) {
 			expectedPath := "/v3/universe/types/34/"
 			assert.Equal(t, expectedPath, r.URL.Path)
 
-			w.Header().Set("Content-Type", "application/json")
+			w.Header().Set(testContentTypeHeader, testJSONContentType)
 			json.NewEncoder(w).Encode(mockResponse)
 		}))
 		defer server.Close()
@@ -130,21 +136,12 @@ func TestESIClient_GetTypeInfo(t *testing.T) {
 	})
 }
 
-// TestESIClient_BatchOperations tests batch processing capabilities
-func TestESIClient_BatchOperations(t *testing.T) {
+// TestESIClientBatchOperations tests batch processing capabilities
+func TestESIClientBatchOperations(t *testing.T) {
 	t.Run("should handle batch market data requests efficiently", func(t *testing.T) {
 		// Given: ESI server that tracks request patterns
 		requestLog := make([]string, 0)
-		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			requestLog = append(requestLog, r.URL.Path+"?"+r.URL.RawQuery)
-			w.Header().Set("Content-Type", "application/json")
-
-			if r.URL.Path == "/v1/markets/10000002/orders/" {
-				w.Write([]byte(`[]`))
-			} else if r.URL.Path == "/v1/markets/10000002/history/" {
-				w.Write([]byte(`[]`))
-			}
-		}))
+		server := createBatchTestServer(&requestLog)
 		defer server.Close()
 
 		// When: Requesting data for multiple types
@@ -154,49 +151,90 @@ func TestESIClient_BatchOperations(t *testing.T) {
 		typeIDs := []int32{34, 35, 36} // Tritanium, Pyerite, Mexallon
 		regionID := int32(10000002)    // The Forge
 
-		// Concurrent requests for orders and history
-		results := make(chan error, len(typeIDs)*2)
+		errorCount := executeBatchRequests(ctx, client, regionID, typeIDs)
 
-		for _, typeID := range typeIDs {
-			go func(tid int32) {
-				_, err := client.GetMarketOrders(ctx, regionID, tid)
-				results <- err
-			}(typeID)
-
-			go func(tid int32) {
-				_, err := client.GetMarketHistory(ctx, regionID, tid)
-				results <- err
-			}(typeID)
-		}
-
-		// Collect results
-		var errorCount int
-		for i := 0; i < len(typeIDs)*2; i++ {
-			if err := <-results; err != nil {
-				errorCount++
-			}
-		}
-
-		// Then: All requests should succeed
+		// Then: All requests should succeed and verify endpoints
 		assert.Equal(t, 0, errorCount)
 		assert.Equal(t, len(typeIDs)*2, len(requestLog))
 
-		// Verify correct endpoints were called
-		orderRequests := 0
-		historyRequests := 0
-		for _, req := range requestLog {
-			if req == "/v1/markets/10000002/orders/?type_id=34" ||
-				req == "/v1/markets/10000002/orders/?type_id=35" ||
-				req == "/v1/markets/10000002/orders/?type_id=36" {
-				orderRequests++
-			} else if req == "/v1/markets/10000002/history/?type_id=34" ||
-				req == "/v1/markets/10000002/history/?type_id=35" ||
-				req == "/v1/markets/10000002/history/?type_id=36" {
-				historyRequests++
-			}
-		}
-
+		orderRequests, historyRequests := countRequestTypes(requestLog)
 		assert.Equal(t, 3, orderRequests)
 		assert.Equal(t, 3, historyRequests)
 	})
+}
+
+// createBatchTestServer creates a test server for batch operations
+func createBatchTestServer(requestLog *[]string) *httptest.Server {
+	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		*requestLog = append(*requestLog, r.URL.Path+"?"+r.URL.RawQuery)
+		w.Header().Set(testContentTypeHeader, testJSONContentType)
+
+		switch r.URL.Path {
+		case "/v1/markets/10000002/orders/":
+			w.Write([]byte(`[]`))
+		case "/v1/markets/10000002/history/":
+			w.Write([]byte(`[]`))
+		}
+	}))
+}
+
+// executeBatchRequests performs concurrent market data requests
+func executeBatchRequests(ctx context.Context, client *ESIClient, regionID int32, typeIDs []int32) int {
+	results := make(chan error, len(typeIDs)*2)
+
+	for _, typeID := range typeIDs {
+		go makeOrderRequest(ctx, client, regionID, typeID, results)
+		go makeHistoryRequest(ctx, client, regionID, typeID, results)
+	}
+
+	return collectResults(results, len(typeIDs)*2)
+}
+
+// makeOrderRequest performs a single order request
+func makeOrderRequest(ctx context.Context, client *ESIClient, regionID, typeID int32, results chan<- error) {
+	_, err := client.GetMarketOrders(ctx, regionID, typeID)
+	results <- err
+}
+
+// makeHistoryRequest performs a single history request
+func makeHistoryRequest(ctx context.Context, client *ESIClient, regionID, typeID int32, results chan<- error) {
+	_, err := client.GetMarketHistory(ctx, regionID, typeID)
+	results <- err
+}
+
+// collectResults collects and counts errors from batch requests
+func collectResults(results <-chan error, expectedCount int) int {
+	var errorCount int
+	for i := 0; i < expectedCount; i++ {
+		if err := <-results; err != nil {
+			errorCount++
+		}
+	}
+	return errorCount
+}
+
+// countRequestTypes counts order and history requests
+func countRequestTypes(requestLog []string) (orderRequests, historyRequests int) {
+	for _, req := range requestLog {
+		if isOrderRequest(req) {
+			orderRequests++
+		} else if isHistoryRequest(req) {
+			historyRequests++
+		}
+	}
+	return
+}
+
+// isOrderRequest checks if request is for market orders
+func isOrderRequest(req string) bool {
+	return req == "/v1/markets/10000002/orders/?type_id=34" ||
+		req == "/v1/markets/10000002/orders/?type_id=35" ||
+		req == "/v1/markets/10000002/orders/?type_id=36"
+}
+
+// isHistoryRequest checks if request is for market history
+func isHistoryRequest(req string) bool {
+	return req == "/v1/markets/10000002/history/?type_id=34" ||
+		req == "/v1/markets/10000002/history/?type_id=35" ||
+		req == "/v1/markets/10000002/history/?type_id=36"
 }

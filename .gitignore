@@ -15,6 +15,16 @@ build/
 *.out
 coverage.txt
 
+# Go executables
+server
+cmd/server/server
+backend/cmd/server/server
+backend/server
+eve-profit2
+backend/eve-profit2
+**/server
+**/*server*
+
 # Database files
 backend/data/sqlite-latest.sqlite
 backend/data/*.sqlite

@@ -118,7 +118,7 @@ func (s *MarketService) GetMarketData(ctx context.Context, req MarketDataRequest
 }
 
 // calculateItemPrice aggregates market orders into current price information
-func (s *MarketService) calculateItemPrice(orders []models.MarketOrder, history []models.MarketHistory) *models.ItemPrice {
+func (s *MarketService) calculateItemPrice(orders []models.MarketOrder, _ []models.MarketHistory) *models.ItemPrice {
 	price := &models.ItemPrice{
 		BuyMax:     0,
 		SellMin:    0,

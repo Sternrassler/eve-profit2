@@ -13,8 +13,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// TestESIClient_GetMarketOrders tests retrieving market orders from ESI
-func TestESIClient_GetMarketOrders(t *testing.T) {
+// Test constants following Clean Code principles
+const (
+	testContentType     = "Content-Type"
+	testApplicationJSON = "application/json"
+)
+
+// TestESIClientGetMarketOrders tests retrieving market orders from ESI
+func TestESIClientGetMarketOrders(t *testing.T) {
 	t.Run("should retrieve market orders for valid region and type", func(t *testing.T) {
 		// Given: Mock ESI server responding with market orders
 		mockResponse := []models.MarketOrder{
@@ -39,7 +45,7 @@ func TestESIClient_GetMarketOrders(t *testing.T) {
 			assert.Equal(t, expectedPath, r.URL.Path)
 			assert.Equal(t, "type_id=34", r.URL.RawQuery)
 
-			w.Header().Set("Content-Type", "application/json")
+			w.Header().Set(testContentType, testApplicationJSON)
 			json.NewEncoder(w).Encode(mockResponse)
 		}))
 		defer server.Close()
@@ -80,14 +86,14 @@ func TestESIClient_GetMarketOrders(t *testing.T) {
 	})
 }
 
-// TestESIClient_RateLimiting tests ESI rate limiting compliance
-func TestESIClient_RateLimiting(t *testing.T) {
+// TestESIClientRateLimiting tests ESI rate limiting compliance
+func TestESIClientRateLimiting(t *testing.T) {
 	t.Run("should respect 150 requests per second limit", func(t *testing.T) {
 		// Given: ESI Client with rate limiting
 		requestCount := 0
 		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			requestCount++
-			w.Header().Set("Content-Type", "application/json")
+			w.Header().Set(testContentType, testApplicationJSON)
 			w.Write([]byte(`[]`))
 		}))
 		defer server.Close()
@@ -118,7 +124,7 @@ func TestESIClient_RateLimiting(t *testing.T) {
 		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("X-ESI-Error-Limit-Remain", "95")
 			w.Header().Set("X-ESI-Error-Limit-Reset", "60")
-			w.Header().Set("Content-Type", "application/json")
+			w.Header().Set(testContentType, testApplicationJSON)
 			w.Write([]byte(`[]`))
 		}))
 		defer server.Close()
@@ -135,8 +141,8 @@ func TestESIClient_RateLimiting(t *testing.T) {
 	})
 }
 
-// TestESIClient_ErrorHandling tests error handling and retry logic
-func TestESIClient_ErrorHandling(t *testing.T) {
+// TestESIClientErrorHandling tests error handling and retry logic
+func TestESIClientErrorHandling(t *testing.T) {
 	t.Run("should retry on temporary network errors", func(t *testing.T) {
 		// Given: Server that fails first request but succeeds on retry
 		requestCount := 0
@@ -146,7 +152,7 @@ func TestESIClient_ErrorHandling(t *testing.T) {
 				w.WriteHeader(http.StatusServiceUnavailable)
 				return
 			}
-			w.Header().Set("Content-Type", "application/json")
+			w.Header().Set(testContentType, testApplicationJSON)
 			w.Write([]byte(`[]`))
 		}))
 		defer server.Close()
@@ -170,7 +176,7 @@ func TestESIClient_ErrorHandling(t *testing.T) {
 		// Given: Slow server
 		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			time.Sleep(200 * time.Millisecond) // Slow response
-			w.Header().Set("Content-Type", "application/json")
+			w.Header().Set(testContentType, testApplicationJSON)
 			w.Write([]byte(`[]`))
 		}))
 		defer server.Close()
@@ -189,15 +195,15 @@ func TestESIClient_ErrorHandling(t *testing.T) {
 	})
 }
 
-// TestESIClient_ParallelRequests tests concurrent request handling
-func TestESIClient_ParallelRequests(t *testing.T) {
+// TestESIClientParallelRequests tests concurrent request handling
+func TestESIClientParallelRequests(t *testing.T) {
 	t.Run("should handle multiple concurrent requests", func(t *testing.T) {
 		// Given: ESI server that can handle multiple requests
 		requestCount := 0
 		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			requestCount++
 			time.Sleep(10 * time.Millisecond) // Simulate processing time
-			w.Header().Set("Content-Type", "application/json")
+			w.Header().Set(testContentType, testApplicationJSON)
 			w.Write([]byte(`[]`))
 		}))
 		defer server.Close()
