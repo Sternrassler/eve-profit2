@@ -20,7 +20,7 @@ import (
 func main() {
 	fmt.Println("Starting EVE Profit Calculator Backend...")
 
-	// Initialize SDE repository
+	// Initialize SDE repository (stub for now)
 	sdeRepo, err := repository.NewSDERepository("./data/sqlite-latest.sqlite")
 	if err != nil {
 		fmt.Printf("Failed to initialize SDE repository: %v\n", err)
@@ -28,7 +28,7 @@ func main() {
 	}
 	defer sdeRepo.Close()
 
-	// Initialize services
+	// Initialize services (stubs for now)
 	marketService := service.NewMarketService(nil)
 	itemService := service.NewItemService(sdeRepo, nil)
 	profitService := service.NewProfitService(marketService, itemService)
