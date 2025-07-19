@@ -1,6 +1,8 @@
 # EVE Profit Calculator 2.0 - Backend
 
-Go Backend für den EVE Online Profit Calculator mit Gin Framework.
+Go Backend für den EVE Online Profit Calculator mit Gin Framework + Clean Code + TDD.
+
+**🎯 Aktuelle Phase:** Phase 3 ESI Integration ✅ ABGESCHLOSSEN
 
 ## 🚀 Quick Start
 

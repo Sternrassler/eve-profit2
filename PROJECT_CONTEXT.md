@@ -5,6 +5,7 @@
 **Zweck:** Moderne Webanwendung für EVE Online Handelsanalysen und Profit-Berechnungen  
 **Erstellt:** 19. Juli 2025  
 **Entwickler:** Karsten Flache  
+**Entwicklungsmethodik:** Clean Code + Test-Driven Development (TDD)
 
 ## 🎯 Projektziele
 - Marktdatenanalyse zwischen verschiedenen EVE Online Stationen
@@ -12,6 +13,14 @@
 - Item-Lookup mit Live-Preisdaten
 - Trend-Analysen und Preishistorie
 - Benutzerfreundliche, moderne Oberfläche
+- **Code-Qualität:** Maintainable, self-documenting, highly tested codebase
+
+## 📚 Code-Standards
+- **Clean Code Prinzipien:** Self-documenting code, SOLID principles, meaningful names
+- **TDD Workflow:** Red-Green-Refactor cycle for all new features
+- **Testing:** 90%+ code coverage, unit + integration tests
+- **Architecture:** Clean Architecture with dependency injection
+- **Documentation:** Living documentation through tests and clean code
 
 ## 🛠️ Technologie-Stack
 ### Frontend
@@ -51,94 +60,30 @@
 - **Linting:** ESLint + Prettier
 - **Testing:** Vitest + React Testing Library
 
-## 🔧 Architektur-Entscheidungen
-### Backend-Struktur (Go)
+## 🎯 EVE Online Business Context
+
+### Wichtige EVE-Konzepte für das Projekt
+- **ISK:** EVE-Währung (Inter Stellar Kredits)
+- **Jita:** Haupt-Handelshub (System-ID: 30000142)
+- **Market Orders:** Buy-Orders (bids) vs Sell-Orders (asks)
+- **Station Trading:** Profit durch Kauf/Verkauf in derselben Station
+- **Inter-Region Trading:** Profit durch Transport zwischen Regionen
+- **Broker Fees:** 3% NPC-Station Gebühren
+- **Sales Tax:** 1-8% basierend auf Character Skills
+
+### EVE ESI API Integration
+- **Market Data:** Live Orders & Historical Price Data
+- **Character Data:** Skills, Assets, Wallet (OAuth required)
+- **Universe Data:** Stations, Regions, Item Types
+- **Rate Limiting:** 150 requests/second maximum
+
+### Gewinn-Berechnungslogik
 ```
-backend/
-├── cmd/
-│   └── server/          # Main Application Entry
-├── internal/
-│   ├── api/            # HTTP Handlers & Routes
-│   ├── service/        # Business Logic Layer
-│   ├── repository/     # Data Access Layer (SDE SQLite)
-│   ├── cache/          # In-Memory Caching Implementation
-│   └── models/         # Data Models & Types
-├── pkg/
-│   ├── eve/            # EVE ESI Client
-│   ├── sde/            # SDE SQLite Client
-│   ├── config/         # Configuration Management
-│   └── utils/          # Shared Utilities
-├── data/
-│   └── sde.sqlite      # EVE Static Data Export Database
-└── migrations/         # SDE Update Scripts
+Total Profit = (Sell Price - Buy Price) * Quantity 
+             - Broker Fees 
+             - Sales Tax 
+             - Transport Costs
 ```
-
-### Frontend-Struktur
-```
-frontend/src/
-├── components/          # Wiederverwendbare UI-Komponenten
-├── pages/              # Hauptseiten/Views
-├── hooks/              # Custom React Hooks
-├── services/           # API-Services (Backend Calls)
-├── types/              # TypeScript Type-Definitionen
-├── utils/              # Hilfsfunktionen
-├── context/            # React Context für State
-└── styles/             # Globale Styles
-```
-
-### Naming Conventions
-**Backend (Go):**
-- **Packages:** lowercase (z.B. `eveapi`, `marketdata`)
-- **Functions:** PascalCase für öffentliche, camelCase für private
-- **Structs:** PascalCase (z.B. `MarketOrder`, `ItemData`)
-- **Interfaces:** PascalCase mit -er Suffix (z.B. `CacheProvider`)
-
-**Frontend (TypeScript):**
-- **Komponenten:** PascalCase (z.B. `MarketAnalysis.tsx`)
-- **Hooks:** camelCase mit "use" Prefix (z.B. `useMarketData.ts`)
-- **Services:** camelCase (z.B. `backendApiService.ts`)
-- **Types:** PascalCase mit Type-Suffix (z.B. `MarketDataType.ts`)
-
-## 🌐 EVE Online API Integration
-### Go Backend - ESI Client Design
-```go
-// Parallelisierte ESI-Abfragen mit Worker Pools
-type ESIClient struct {
-    httpClient   *http.Client
-    rateLimiter  *rate.Limiter
-    cache        CacheProvider
-    workerPool   int
-    authClient   *OAuthClient  // Für Character API calls
-}
-
-// Beispiel für parallele Marktdaten-Abfrage
-func (c *ESIClient) GetMarketDataParallel(regions []int32, typeID int32) 
-
-// Character API mit OAuth Token
-func (c *ESIClient) GetCharacterSkills(characterID int32, token string) (*CharacterSkills, error)
-func (c *ESIClient) GetCharacterAssets(characterID int32, token string) ([]Asset, error)
-```
-
-### ESI Endpoints (Wichtigste)
-**Market Data:**
-- Market Orders: `/markets/{region_id}/orders/`
-- Market History: `/markets/{region_id}/history/`
-- Market Groups: `/markets/groups/`
-- Universe Types: `/universe/types/`
-- Universe Stations: `/universe/stations/`
-
-**Character Data (OAuth required):**
-- Character Info: `/characters/{character_id}/`
-- Character Skills: `/characters/{character_id}/skills/`
-- Character Assets: `/characters/{character_id}/assets/`
-- Character Ships: `/characters/{character_id}/ships/`
-- Character Wallet: `/characters/{character_id}/wallet/`
-- Character Orders: `/characters/{character_id}/orders/`
-
-### Wichtige EVE-Konzepte
-- **Region IDs:** Numerische IDs für Handelsregionen
-- **Type IDs:** Numerische IDs für Items/Schiffe
-- **Station IDs:** Numerische IDs für Handelsstationen
 - **Security Status:** High-Sec (≥0.5), Low-Sec (0.1-0.4), Null-Sec (≤0.0)
 
 ## 📊 Kerntfunktionen

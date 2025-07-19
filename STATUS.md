@@ -3,6 +3,28 @@
 > **Letzte Aktualisierung:** 19. Juli 2025  
 > **Aktuelle Phase:** Phase 3 ESI Integration ✅ ABGESCHLOSSEN  
 > **Entwickler:** Karsten Flache  
+> **Entwicklungsmethodik:** Clean Code + Test-Driven Development (TDD)
+
+## 🎯 Projekt-Übersicht
+
+**EVE Online Profit Calculator** - Moderne Trading-Optimierung mit Character-Integration  
+**Tech Stack:** Go + Gin + ESI + SDE SQLite + React + TypeScript + Vite  
+**Code-Qualität:** Clean Code Prinzipien + TDD Red-Green-Refactor  
+
+### 🎯 Kernfunktionen
+- Marktdatenanalyse zwischen EVE Online Stationen
+- Profit-Berechnungen für Trading-Routen mit Character Skills
+- Real-time ESI Integration mit Rate Limiting
+- EVE SSO Authentication für Character-Daten
+
+### 📚 Entwicklungsstandards
+- **Clean Code:** Selbstdokumentierender Code, SOLID Prinzipien, aussagekräftige Namen
+- **TDD:** Test-First Entwicklung, 90%+ Code Coverage, Red-Green-Refactor Zyklus
+- **Code-Qualität:** Max. 20 Zeilen pro Funktion, Single Responsibility, Dependency Injectionculator 2.0 - Entwicklungsstatus
+
+> **Letzte Aktualisierung:** 19. Juli 2025  
+> **Aktuelle Phase:** Phase 3 ESI Integration ✅ ABGESCHLOSSEN  
+> **Entwickler:** Karsten Flache  
 
 ## � Projekt-Übersicht
 
@@ -46,33 +68,49 @@
 
 ---
 
-## 🏗️ Aktuelle Architektur
+## 🏗️ Technische Architektur
 
-### Backend-Struktur (Go)
+### Backend-Struktur (Go + Clean Code)
 ```
 backend/
 ├── cmd/server/main.go              # Server Entry Point (Port 9000)
 ├── internal/
-│   ├── config/config.go            # Zentrales Konfigurationsmanagement
+│   ├── config/config.go            # Configuration Management
 │   ├── service/services.go         # Business Logic (Market + Item)
-│   ├── repository/sde.go           # SDE SQLite Integration
-│   └── models/models.go            # Data Models
-├── pkg/esi/client.go               # ESI Client mit Rate Limiting
+│   ├── repository/sde.go           # SDE SQLite Data Access Layer
+│   ├── api/handlers/               # HTTP Request Handlers
+│   │   ├── character.go            # EVE SSO & Character Data (Phase 4)
+│   │   ├── market.go               # Market Data & Analysis (Phase 4)
+│   │   ├── items.go                # Item Search & Lookup (Phase 4)
+│   │   └── profit.go               # Profit Calculations (Phase 4)
+│   ├── cache/cache.go              # Multi-layer Caching
+│   └── models/models.go            # Domain Models & Types
+├── pkg/
+│   ├── esi/client.go               # ESI Client mit Rate Limiting
+│   ├── config/                     # Config Structures
+│   └── utils/                      # Shared Utilities
 └── data/sqlite-latest.sqlite       # EVE SDE Database (529MB)
 ```
 
-### API Endpoints (Ready)
-- `GET /` - API Info + Konfigurationsstatus
-- `GET /api/v1/health` - Health Check
-- `GET /api/v1/esi/test` - ESI Connection Test (Tritanium Orders)
-- `GET /api/v1/sde/test` - SDE Database Test (Item Lookup)
-- `GET /api/v1/auth/login` - EVE SSO Konfiguration
-
-### ESI Integration Details
+### ESI Integration (Production-Ready)
+- **EVE Application:** Client ID `0928b4bcd20242aeb9b8be10f5451094`
 - **Callback URL:** `http://localhost:9000/callback`
-- **ESI Scopes:** 9 konfigurierte Berechtigungen (Skills, Assets, Wallet, etc.)
-- **Rate Limiting:** ESI-konform mit 150 Anfragen/Sekunde
-- **Error Handling:** Retry Logic + Network Error Recovery
+- **Rate Limiting:** 150 req/sec ESI-compliant
+- **Scopes:** 9 configured (Skills, Assets, Wallet, etc.)
+- **Error Handling:** Retry Logic + Circuit Breaker
+
+### SDE Database Integration
+- **Source:** Fuzzwork SQLite Auto-Download
+- **Size:** 529MB with 25,818 Items
+- **Performance:** GetItemByID <0.01s, SearchItems 0.02s
+- **Cache Strategy:** In-Memory + TTL-based invalidation
+
+### API Endpoints (Ready)
+- `GET /` - API Info + Configuration Status
+- `GET /api/v1/health` - Health Check
+- `GET /api/v1/esi/test` - ESI Connection Test
+- `GET /api/v1/sde/test` - SDE Database Test
+- `GET /api/v1/auth/login` - EVE SSO Configuration
 
 ---
 
@@ -121,21 +159,28 @@ cp .env.example .env
 ## 📋 Nächste Phasen
 
 ### Phase 4: API Handlers (Nächste Priorität)
-**Status:** Bereit für Entwicklung
+**Status:** Bereit für TDD-Entwicklung
 
-**Zu implementieren:**
-- [ ] Market Data Handler (mit ESI Service Integration)
-- [ ] Item Search Handler (mit SDE Integration)  
-- [ ] Character Auth Handler (EVE SSO OAuth Flow)
-- [ ] Profit Calculation Handler
-- [ ] Enhanced Error Handling & Logging
+**TDD-Implementierung:**
+- [ ] Market Data Handler (TDD + ESI Service Integration)
+- [ ] Item Search Handler (TDD + SDE Integration)  
+- [ ] Character Auth Handler (TDD + EVE SSO OAuth Flow)
+- [ ] Profit Calculation Handler (TDD + Clean Code Business Logic)
+- [ ] Enhanced Error Handling & Logging (TDD für alle Error Cases)
 
-### Phase 5: Frontend Development
-- [ ] React + TypeScript + Vite Setup
-- [ ] Component Architecture Design
-- [ ] Backend API Integration (Port 9000)
-- [ ] EVE SSO Login Flow
-- [ ] Trading Dashboard UI
+**Clean Code Focus:**
+- Dependency Injection für alle Handler
+- Interface-basierte Service-Layer
+- Self-documenting API Response Structures
+- Single Responsibility für jeden Handler
+
+### Phase 5: Frontend Development (TDD + Clean Code)
+- [ ] React + TypeScript + Vite Setup mit Testing Framework
+- [ ] TDD für UI Components (React Testing Library)
+- [ ] Clean Component Architecture (Single Responsibility)
+- [ ] Backend API Integration (Port 9000) mit Error Handling
+- [ ] EVE SSO Login Flow (TDD für Authentication States)
+- [ ] Trading Dashboard UI (Clean Code Component Design)
 - [ ] Responsive Design (Mobile-friendly)
 
 ### Phase 6: Production Deployment

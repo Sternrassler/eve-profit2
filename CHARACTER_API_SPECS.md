@@ -1,6 +1,8 @@
 # Character API Integration - EVE Profit Calculator 2.0
 
-## 🔐 EVE SSO OAuth Integration
+## 🔐 EVE SSO OAuth Integration (Phase 4)
+
+**WICHTIG:** Diese Datei ist für Phase 4 - API Handlers Implementation.
 
 ### OAuth Flow Overview
 ```
@@ -11,43 +13,75 @@
 5. JWT issued to frontend with character session
 ```
 
-### EVE SSO Configuration
-```go
-// pkg/eve/oauth.go
-type OAuthConfig struct {
-    ClientID     string
-    ClientSecret string
-    RedirectURL  string
-    Scopes       []string
-}
+### EVE Application Configuration (Production-Ready)
+- **Client ID:** `0928b4bcd20242aeb9b8be10f5451094`
+- **Client Secret:** `AQPjLZ3VYAewR59J5jStZs52dY7jISGVLwXv5NA`
+- **Callback URL:** `http://localhost:9000/callback`
 
-// Required Scopes für Character Data
+### Required Scopes
+```go
 var RequiredScopes = []string{
     "esi-skills.read_skills.v1",           // Character Skills
     "esi-assets.read_assets.v1",           // Character Assets  
     "esi-wallet.read_character_wallet.v1", // Wallet Balance
-    "esi-markets.read_character_orders.v1", // Market Orders
-    "esi-location.read_ships.v1",          // Current Ship
-}
-
-type EVEAuthClient struct {
-    config   *oauth2.Config
-    verifier *oidc.IDTokenVerifier
-    logger   zerolog.Logger
+    "esi-location.read_location.v1",       // Current Location
+    "esi-location.read_ship_type.v1",      // Current Ship
 }
 ```
 
-## 📊 Character Data Models
+## 📊 Clean Code Character Models
 
-### Character Info
+### Domain Models (TDD Implementation)
 ```go
-// internal/models/character.go
+// Character represents an EVE Online character
 type Character struct {
-    CharacterID     int32     `json:"characterId"`
-    CharacterName   string    `json:"characterName"`
-    CorporationID   int32     `json:"corporationId"`
-    AllianceID      *int32    `json:"allianceId,omitempty"`
-    SecurityStatus  float64   `json:"securityStatus"`
+    ID              int32   `json:"characterId"`
+    Name            string  `json:"characterName"`
+    CorporationID   int32   `json:"corporationId"`
+    SecurityStatus  float64 `json:"securityStatus"`
+    WalletBalance   float64 `json:"walletBalance"`
+    Skills          []Skill `json:"skills"`
+}
+
+// Skill represents a character skill
+type Skill struct {
+    SkillID          int32 `json:"skillId"`
+    ActiveSkillLevel int32 `json:"activeSkillLevel"`
+    SkillPointsInSkill int64 `json:"skillPointsInSkill"`
+}
+
+// TradingSkills contains relevant trading skills
+type TradingSkills struct {
+    BrokerRelations     int32 `json:"brokerRelations"`     // Reduces broker fees
+    Accounting          int32 `json:"accounting"`          // Reduces sales tax
+    MarketingSkill      int32 `json:"marketing"`           // Increases market order range
+}
+```
+
+## 🧪 TDD Implementation Plan (Phase 4)
+
+### Test-First Development for Character API:
+```go
+// 1. 🔴 RED: Write failing tests first
+func TestCharacterHandler_AuthCallback_WithValidCode_ShouldReturnJWT(t *testing.T)
+func TestCharacterService_GetCharacterSkills_WithValidToken_ShouldReturnSkills(t *testing.T)
+func TestOAuthClient_ExchangeCodeForToken_WithValidCode_ShouldReturnToken(t *testing.T)
+
+// 2. 🟢 GREEN: Implement minimal functionality
+// 3. 🔄 REFACTOR: Apply Clean Code principles
+```
+
+### API Endpoints to Implement (TDD):
+- `POST /api/v1/auth/login` - EVE SSO Login redirect
+- `GET /api/v1/auth/callback` - OAuth callback handler
+- `GET /api/v1/character/profile` - Character information
+- `GET /api/v1/character/skills` - Character skills (trading relevant)
+- `GET /api/v1/character/wallet` - Wallet balance
+- `POST /api/v1/auth/logout` - Session cleanup
+
+---
+
+**Phase 4 Ready:** All EVE SSO configuration is complete. Start TDD implementation of Character API handlers.
     Birthday        time.Time `json:"birthday"`
     LastLogin       time.Time `json:"lastLogin"`
     TotalSP         int64     `json:"totalSp"`

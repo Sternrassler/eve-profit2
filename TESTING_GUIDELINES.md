@@ -1,53 +1,168 @@
 # Testing Guidelines - EVE Profit Calculator 2.0
 
-## 🧪 Test-Driven Development (TDD) Workflow
+## 🧪 Clean Code + Test-Driven Development (TDD)
 
-### **Wann TDD anwenden:**
-- **Ab Phase 2:** Alle neuen Backend-Features (SDE Client, ESI Client, etc.)
-- **Business Logic:** Profit-Berechnungen, Trading-Algorithmen, Fee-Calculationen
-- **API Services:** Alle Service-Layer-Implementierungen
-- **Critical Paths:** Authentication, Data Transformation, Caching Logic
+**Dieses Projekt verwendet strikt TDD kombiniert mit Clean Code Prinzipien.**
 
-### **TDD Red-Green-Refactor Cycle:**
+### **TDD + Clean Code Philosophie:**
+- **Test-First:** Alle neuen Features beginnen mit einem Test
+- **Clean Tests:** Tests sind genauso wichtig wie Production Code
+- **Living Documentation:** Tests dokumentieren das erwartete Verhalten
+- **Refactoring Safety:** Tests ermöglichen sicheres Refactoring
+
+## 🔄 TDD Red-Green-Refactor Cycle (Clean Code Edition)
+
+### **1. 🔴 RED Phase - Test schreiben:**
+```go
+// ✅ Clean Test: Beschreibt Verhalten klar und präzise
+func TestCalculateProfit_WithValidInputs_ShouldReturnCorrectProfit(t *testing.T) {
+    // Arrange: Setup with meaningful test data
+    buyPrice := 100.0
+    sellPrice := 120.0
+    quantity := 10
+    
+    // Act: Call the function under test
+    actualProfit := CalculateProfit(buyPrice, sellPrice, quantity)
+    
+    // Assert: Verify expected behavior
+    expectedProfit := 200.0 // (120-100) * 10
+    assert.Equal(t, expectedProfit, actualProfit, 
+        "Profit should be (sellPrice - buyPrice) * quantity")
+}
 ```
-1. 🔴 RED: Schreibe einen fehlschlagenden Test
-   - Definiere die gewünschte Funktionalität
-   - Test sollte kompilieren, aber fehlschlagen
-   
-2. 🟢 GREEN: Minimale Implementierung für Test-Pass
-   - Schreibe nur soviel Code wie nötig
-   - Test muss erfolgreich durchlaufen
-   
-3. 🔄 REFACTOR: Code verbessern ohne Tests zu brechen
-   - Optimiere Performance, Lesbarkeit, Struktur
-   - Alle Tests müssen weiterhin bestehen
-   
-4. 📝 REPEAT: Für jede neue Funktion
+
+**RED Phase Checklist:**
+- [ ] Test-Name beschreibt das erwartete Verhalten
+- [ ] Test ist selbstdokumentierend
+- [ ] Arrange-Act-Assert Pattern verwendet
+- [ ] Test kompiliert aber schlägt fehl
+
+### **2. 🟢 GREEN Phase - Minimal-Implementation:**
+```go
+// ✅ Minimal aber funktional
+func CalculateProfit(buyPrice, sellPrice float64, quantity int) float64 {
+    return (sellPrice - buyPrice) * float64(quantity)
+}
+```
+
+**GREEN Phase Checklist:**
+- [ ] Gerade genug Code für grünen Test
+- [ ] Keine Optimierung oder "schöne" Lösungen
+- [ ] Test läuft erfolgreich durch
+
+### **3. 🔄 REFACTOR Phase - Clean Code anwenden:**
+```go
+// ✅ Clean Code: Verbesserte Lesbarkeit und Robustheit
+func CalculateProfit(buyPrice, sellPrice float64, quantity int) float64 {
+    if quantity <= 0 {
+        return 0.0
+    }
+    
+    if buyPrice < 0 || sellPrice < 0 {
+        return 0.0
+    }
+    
+    profitPerUnit := sellPrice - buyPrice
+    totalProfit := profitPerUnit * float64(quantity)
+    
+    return totalProfit
+}
+```
+
+**REFACTOR Phase Checklist:**
+- [ ] Clean Code Prinzipien angewendet
+- [ ] Aussagekräftige Variablennamen
+- [ ] Edge Cases behandelt
+- [ ] Alle Tests bleiben grün
+
+## 🎯 Clean Code Testing Standards
+
+### **Test-Namen als Spezifikation:**
+```go
+// ✅ Test-Namen folgen: [Method]_[Scenario]_[ExpectedBehavior]
+func TestCalculateProfit_WithZeroQuantity_ShouldReturnZero(t *testing.T)
+func TestCalculateProfit_WithNegativePrices_ShouldReturnZero(t *testing.T) 
+func TestCalculateProfit_WithLargePriceSpread_ShouldReturnHighProfit(t *testing.T)
+```
+
+### **Arrange-Act-Assert (AAA) Pattern:**
+```go
+func TestMarketService_GetBestDeals_ShouldReturnSortedByProfit(t *testing.T) {
+    // Arrange: Setup test conditions
+    mockESI := setupMockESIClient()
+    mockCache := setupMockCache()
+    service := NewMarketService(mockESI, mockCache)
+    
+    expectedDeals := []Deal{
+        {Item: "Tritanium", Profit: 500},
+        {Item: "Pyerite", Profit: 300},
+        {Item: "Mexallon", Profit: 100},
+    }
+    mockESI.ExpectGetMarketData().Return(expectedDeals, nil)
+    
+    // Act: Execute the function under test
+    actualDeals, err := service.GetBestDeals("Jita", 3)
+    
+    // Assert: Verify the expected behavior
+    require.NoError(t, err)
+    assert.Len(t, actualDeals, 3)
+    assert.Equal(t, 500.0, actualDeals[0].Profit, "First deal should have highest profit")
+    assert.Equal(t, 300.0, actualDeals[1].Profit, "Second deal should have medium profit")
+    assert.Equal(t, 100.0, actualDeals[2].Profit, "Third deal should have lowest profit")
+}
+```
+
+### **Test-Isolation und Helper Functions:**
+```go
+// ✅ Clean Test Helpers für bessere Lesbarkeit
+func setupTestMarketService(t *testing.T) (*MarketService, *MockESI, *MockCache) {
+    mockESI := &MockESI{}
+    mockCache := &MockCache{}
+    service := NewMarketService(mockESI, mockCache)
+    return service, mockESI, mockCache
+}
+
+func createTestDeal(itemName string, profit float64) Deal {
+    return Deal{
+        Item:   itemName,
+        Profit: profit,
+        Volume: 1000, // Default test volume
+    }
+}
+
+func assertDealsAreSortedByProfitDesc(t *testing.T, deals []Deal) {
+    for i := 1; i < len(deals); i++ {
+        assert.GreaterOrEqual(t, deals[i-1].Profit, deals[i].Profit,
+            "Deals should be sorted by profit in descending order")
+    }
+}
 ```
 
 ## 🎯 Test-Strategien nach Entwicklungsphase
 
-### **Phase 2: SDE Client (SQLite Integration)**
+### **Phase 2: SDE Client (SQLite Integration) - TDD**
 ```go
-// Test Examples für SDE Client
-func TestSDERepository_GetItemByID(t *testing.T)
-func TestSDERepository_SearchItems(t *testing.T)
-func TestSDERepository_GetStationsBySystem(t *testing.T)
-func TestSDERepository_GetRegions(t *testing.T)
+// ✅ TDD Examples für SDE Client
+func TestSDERepository_GetItemByID_WithValidID_ShouldReturnCorrectItem(t *testing.T)
+func TestSDERepository_GetItemByID_WithInvalidID_ShouldReturnNotFoundError(t *testing.T)
+func TestSDERepository_SearchItems_WithPartialName_ShouldReturnMatchingItems(t *testing.T)
+func TestSDERepository_SearchItems_WithEmptyQuery_ShouldReturnEmptyResult(t *testing.T)
 ```
 
-**Test-Focus:**
+**TDD-Focus Phase 2:**
 - Database Connection & Query Performance
 - Data Integrity & Type Mapping
 - Error Handling (Item not found, DB connection issues)
 - Cache Integration Tests
 
-### **Phase 3: ESI API Client (EVE External API)**
+### **Phase 3: ESI API Client (EVE External API) - TDD**
 ```go
-// Test Examples für ESI Client
-func TestESIClient_GetMarketOrders(t *testing.T)
-func TestESIClient_RateLimiting(t *testing.T)
-func TestESIClient_ParallelRequests(t *testing.T)
+// ✅ TDD Examples für ESI Client
+func TestESIClient_GetMarketOrders_WithValidRegion_ShouldReturnOrdersData(t *testing.T)
+func TestESIClient_GetMarketOrders_WithRateLimit_ShouldRespectLimits(t *testing.T)
+func TestESIClient_ParallelRequests_WithMultipleRegions_ShouldHandleConcurrency(t *testing.T)
+func TestESIClient_NetworkError_ShouldRetryWithExponentialBackoff(t *testing.T)
+```
 func TestESIClient_ErrorHandling(t *testing.T)
 ```
 

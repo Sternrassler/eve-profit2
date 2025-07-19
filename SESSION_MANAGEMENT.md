@@ -48,22 +48,24 @@ git commit -m "..."          # Commit erstellen
 - **Config:** EVE Application Settings integriert
 
 ### 🎯 Phase 4 Bereit (Nächster Schritt)
-- **Ziel:** API Handlers für Market Data & Items
+- **Ziel:** API Handlers für Market Data & Items (TDD)
 - **Basis:** ESI Client + Service Layer fertig
-- **Geschätzt:** 1-2 Entwicklungstage
+- **Geschätzt:** 1-2 Entwicklungstage mit Clean Code + TDD
 
-## 📁 Wichtige Dateien
+## 📁 Konsolidierte Dokumentation
 
-### Aktuelle Architektur
-- `backend/cmd/server/main.go` - Server Entry Point
-- `backend/internal/config/config.go` - Konfiguration
-- `backend/pkg/esi/client.go` - ESI Client
-- `backend/internal/service/services.go` - Business Logic
+### Kern-Dokumentation (Post-Konsolidierung)
+- `STATUS.md` - **ZENTRAL:** Entwicklungsstand + Architektur + Phasen
+- `DEVELOPMENT_GUIDELINES.md` - Clean Code + TDD Standards
+- `TESTING_GUIDELINES.md` - TDD Patterns + Best Practices
+- `PROJECT_CONTEXT.md` - Business Context + EVE-Spezifika
+- `CHARACTER_API_SPECS.md` - Phase 4 Character API (OAuth)
+- `CLEAN_CODE_REFERENCE.md` - Clean Code Prinzipien
 
-### Dokumentation
-- `STATUS.md` - Aktueller Entwicklungsstand
-- `PROJECT_CONTEXT.md` - Projekt-Übersicht
-- `ESI_INTEGRATION.md` - ESI Setup Details
+### Entfernte Redundanzen
+- ❌ `GO_BACKEND_SPECS.md` → Inhalt in STATUS.md
+- ❌ `SDE_INTEGRATION_SPECS.md` → Inhalt in STATUS.md  
+- ❌ `ESI_INTEGRATION.md` → Inhalt in STATUS.md
 
 ---
 
