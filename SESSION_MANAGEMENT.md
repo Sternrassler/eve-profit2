@@ -92,6 +92,30 @@ GitHub Copilot kann **NICHT automatisch** Arbeit nach Session-Unterbrechungen wi
 
 ## 📝 **Status-Dokumentation Template**
 
+### **Git-Workflow für Entwicklungsphasen:**
+```bash
+# Nach jeder abgeschlossenen Phase automatischer Commit + Push:
+./commit-phase.sh <phase-number> "<phase-name>" "[description]"
+
+# Beispiele:
+./commit-phase.sh 2 "SDE Client Implementation" "SQLite integration für Items, Stations, Regionen"
+./commit-phase.sh 3 "ESI API Client" "Rate limiting und parallele Marktdaten-Abfragen"
+./commit-phase.sh 4 "Character API" "EVE SSO OAuth + JWT Token Management"
+```
+
+### **Git-Historie als Fortschritts-Tracking:**
+- Jeder Commit = Abgeschlossene Entwicklungsphase
+- Detaillierte Commit-Messages mit Features + Tests
+- Remote Repository: https://github.com/Sternrassler/eve-profit2
+- Automatische Dokumentation des Entwicklungsfortschritts
+
+### **Session-Wiederaufnahme via Git:**
+```bash
+git log --oneline              # Zeigt alle abgeschlossenen Phasen
+git show HEAD                  # Details der letzten implementierten Phase
+git diff HEAD~1                # Änderungen der letzten Phase
+```
+
 ### **Automatisches Status-Update Format:**
 ```markdown
 # Development Status - [Datum]

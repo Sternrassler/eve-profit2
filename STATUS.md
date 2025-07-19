@@ -180,4 +180,10 @@ cd backend && go run cmd/server/main.go  # Startet auf :8080
 ./download-sde.sh  # Lädt SDE herunter (falls nicht vorhanden)
 ```
 
+### **Git Workflow nach jeder Phase:**
+```
+./commit-phase.sh 2 "SDE Client Implementation" "SQLite integration completed"
+# Automatischer Commit + Push mit detaillierter Beschreibung
+```
+
 **Ready for Implementation! 🚀**
