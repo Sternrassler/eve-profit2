@@ -1,0 +1,145 @@
+package main
+
+import (
+	"context"
+	"fmt"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+
+	"eve-profit2/internal/api/handlers"
+	"eve-profit2/internal/api/middleware"
+	"eve-profit2/internal/repository"
+	"eve-profit2/internal/service"
+
+	"github.com/gin-gonic/gin"
+)
+
+func main() {
+	fmt.Println("Starting EVE Profit Calculator Backend...")
+
+	// Initialize SDE repository (stub for now)
+	sdeRepo, err := repository.NewSDERepository("./data/sqlite-latest.sqlite")
+	if err != nil {
+		fmt.Printf("Failed to initialize SDE repository: %v\n", err)
+		os.Exit(1)
+	}
+	defer sdeRepo.Close()
+
+	// Initialize services (stubs for now)
+	marketService := service.NewMarketService(nil)
+	itemService := service.NewItemService(sdeRepo, nil)
+	profitService := service.NewProfitService(marketService, itemService)
+	characterService := service.NewCharacterService(nil)
+
+	// Initialize handlers
+	marketHandler := handlers.NewMarketHandler(marketService)
+	itemHandler := handlers.NewItemHandler(itemService)
+	profitHandler := handlers.NewProfitHandler(profitService)
+	characterHandler := handlers.NewCharacterHandler(characterService)
+	healthHandler := handlers.NewHealthHandler()
+
+	// Setup Gin router
+	gin.SetMode(gin.ReleaseMode)
+	router := gin.New()
+
+	// Global middleware
+	router.Use(middleware.Logger())
+	router.Use(middleware.Recovery())
+	router.Use(middleware.CORS())
+
+	// Health check endpoint
+	router.GET("/health", healthHandler.HealthCheck)
+
+	// Root endpoint
+	router.GET("/", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "EVE Profit Calculator 2.0 Backend",
+			"status":  "running",
+			"version": "1.0.0",
+		})
+	})
+
+	// API v1 routes
+	v1 := router.Group("/api/v1")
+	{
+		// Market data endpoints
+		market := v1.Group("/market")
+		{
+			market.GET("/prices/:item_id", marketHandler.GetItemPrices)
+			market.GET("/orders/:item_id", marketHandler.GetItemOrders)
+			market.GET("/history/:item_id", marketHandler.GetPriceHistory)
+		}
+
+		// Item lookup endpoints (SDE)
+		items := v1.Group("/items")
+		{
+			items.GET("/search", itemHandler.SearchItems)
+			items.GET("/:item_id", itemHandler.GetItemDetails)
+			items.GET("/categories", itemHandler.GetCategories)
+		}
+
+		// Profit calculation endpoints
+		profit := v1.Group("/profit")
+		{
+			profit.POST("/calculate", profitHandler.CalculateProfit)
+			profit.GET("/routes", profitHandler.GetTradingRoutes)
+		}
+
+		// Character data endpoints (requires auth)
+		character := v1.Group("/character")
+		character.Use(middleware.RequireAuth())
+		{
+			character.GET("/info", characterHandler.GetCharacterInfo)
+			character.GET("/assets", characterHandler.GetAssets)
+			character.GET("/wallet", characterHandler.GetWallet)
+			character.GET("/orders", characterHandler.GetOrders)
+			character.GET("/skills", characterHandler.GetSkills)
+		}
+
+		// Authentication endpoints
+		auth := v1.Group("/auth")
+		{
+			auth.GET("/login", characterHandler.InitiateLogin)
+			auth.GET("/callback", characterHandler.HandleCallback)
+			auth.POST("/refresh", characterHandler.RefreshToken)
+		}
+	}
+
+	// Start server
+	srv := &http.Server{
+		Addr:         ":8080",
+		Handler:      router,
+		ReadTimeout:  15 * time.Second,
+		WriteTimeout: 15 * time.Second,
+		IdleTimeout:  60 * time.Second,
+	}
+
+	// Graceful shutdown
+	go func() {
+		fmt.Println("Server starting on :8080")
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			fmt.Printf("Failed to start server: %v\n", err)
+			os.Exit(1)
+		}
+	}()
+
+	// Wait for interrupt signal
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+
+	fmt.Println("Shutting down server...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	if err := srv.Shutdown(ctx); err != nil {
+		fmt.Printf("Server forced to shutdown: %v\n", err)
+		os.Exit(1)
+	}
+
+	fmt.Println("Server exited")
+}
