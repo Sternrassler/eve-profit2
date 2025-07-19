@@ -42,9 +42,9 @@ EVE Online Profit Calculator mit Go Backend + React Frontend
 
 ## 🚧 **Currently Working On:**
 **Status:** Go Backend Foundation implementiert!  
-**Next:** SDE Client Implementation + ESI Integration
+**Next:** TDD Setup + SDE Client Implementation (Phase 2)
 
-**Aktuelle Implementation:** Go Backend Grundstruktur steht und läuft auf :8080
+**TDD-Workflow ab Phase 2:** Test-First Development für alle neuen Features
 
 ## 📁 **Project Structure Current:**
 ```
@@ -84,20 +84,21 @@ eve-profit2/
 - [ ] BigCache Setup + Configuration (Cache-Stubs vorhanden)
 - [x] Health Check Endpoint
 
-### **Phase 2: Core Services**
-- [ ] SDE Client Implementation (Items, Stations, Regionen)
-- [ ] ESI Client mit Rate Limiting
-- [ ] Market Data Service (ESI → Cache)
-- [ ] Basic API Endpoints für Market Data
+### **Phase 2: Core Services + TDD Implementation**
+- [ ] Test Setup: Go testing framework + test structure
+- [ ] SDE Client Implementation (TDD: Items, Stations, Regionen)
+- [ ] ESI Client mit Rate Limiting (TDD für API calls)
+- [ ] Market Data Service (ESI → Cache) mit Unit Tests
+- [ ] API Endpoints Integration Tests
 
-### **Phase 3: Character Integration**
-- [ ] EVE SSO OAuth Implementation
-- [ ] Character API Services
-- [ ] JWT Token Management
-- [ ] Character Data Endpoints
+### **Phase 3: Character Integration + Testing**
+- [ ] EVE SSO OAuth Implementation (TDD für Auth Flow)
+- [ ] Character API Services mit Mocks
+- [ ] JWT Token Management Tests
+- [ ] Character Data Endpoints Integration Tests
 
-### **Phase 4: Business Logic**
-- [ ] Profit Calculation Engine
+### **Phase 4: Business Logic + Test Coverage**
+- [ ] Profit Calculation Engine (TDD Critical Business Logic)
 - [ ] Trading Optimization Algorithms
 - [ ] Skill-basierte Fee-Berechnungen
 - [ ] Multi-Region Comparisons
@@ -171,7 +172,7 @@ Nächster Schritt: Implementiere den SDE Client mit SQLite-Integration und echte
 
 ### **Für nächsten Phase 2:**
 ```
-Backend-Foundation ist komplett. Starte Phase 2: SDE Client Implementation mit Items, Stations, Regionen aus SQLite.
+Backend-Foundation ist komplett. Starte Phase 2 mit TDD: Setup Go Testing + SDE Client Implementation (Test-First Approach).
 ```
 
 ### **Backend starten:**

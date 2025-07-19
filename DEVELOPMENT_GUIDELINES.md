@@ -27,6 +27,15 @@ Diese Datei enthält wichtige Entwicklungsrichtlinien, die bei jeder neuen Copil
 - **Caching:** 5 Minuten für Marktdaten, 24h für statische Daten
 - **Error Handling:** Graceful degradation bei API-Fehlern
 
+### Testing Standards
+- **Test-Driven Development (TDD):** Pflicht ab Phase 2
+- **Test-First Approach:** Schreibe Tests vor der Implementierung
+- **Coverage Minimum:** 80% Code Coverage für Business Logic
+- **Test Kategorien:**
+  - Unit Tests: Einzelne Funktionen/Methoden
+  - Integration Tests: API Endpoints + Database
+  - End-to-End Tests: Critical User Flows
+
 ## 🎨 UI-Standards
 
 ### Komponenten-Hierarchie
@@ -137,6 +146,91 @@ class BackendApiService {
 - **Loading:** Loading-States in UI mit Skeleton Components
 
 ## 🧪 Testing-Anforderungen
+
+## 🧪 Testing-Anforderungen
+
+### TDD-Workflow (Test-Driven Development):
+```
+1. 🔴 RED: Schreibe einen fehlschlagenden Test
+2. 🟢 GREEN: Implementiere minimalen Code für Test-Pass
+3. 🔄 REFACTOR: Verbessere Code ohne Tests zu brechen
+4. 📝 REPEAT: Für jede neue Funktion
+```
+
+### Test-Strategie nach Entwicklungsphase:
+- **Phase 2:** SDE Client Tests (Items, Stations, Regionen)
+- **Phase 3:** ESI API Client Tests (Rate Limiting, Parallel Calls)
+- **Phase 4:** Character API Tests (OAuth, JWT, Permissions)
+- **Phase 5:** Business Logic Tests (Profit Calculation, Trading Routes)
+- **Phase 6:** Frontend Component Tests (React Testing Library)
+
+### Go Backend Testing:
+```go
+// Unit Test Beispiel
+func TestSDERepository_GetItemByID(t *testing.T) {
+    // Given: Test Database Setup
+    repo := setupTestSDERepo(t)
+    
+    // When: Execute Function
+    item, err := repo.GetItemByID(34) // Tritanium
+    
+    // Then: Verify Results
+    assert.NoError(t, err)
+    assert.Equal(t, "Tritanium", item.TypeName)
+    assert.Equal(t, int32(34), item.TypeID)
+}
+```
+
+### Frontend Testing:
+```typescript
+// React Component Test Beispiel
+describe('ItemSearchComponent', () => {
+  it('should display search results when API returns data', async () => {
+    // Given: Mock API Response
+    mockApiService.searchItems.mockResolvedValue(mockItems);
+    
+    // When: User types search query
+    render(<ItemSearchComponent />);
+    fireEvent.change(screen.getByRole('textbox'), { 
+      target: { value: 'Tritanium' } 
+    });
+    
+    // Then: Results should be displayed
+    await waitFor(() => {
+      expect(screen.getByText('Tritanium')).toBeInTheDocument();
+    });
+  });
+});
+```
+
+### Test-Ordnerstruktur:
+```
+backend/
+├── internal/
+│   ├── repository/
+│   │   ├── sde.go
+│   │   └── sde_test.go         # Unit Tests
+│   ├── service/
+│   │   ├── market.go
+│   │   └── market_test.go      # Business Logic Tests
+│   └── api/handlers/
+│       ├── items.go
+│       └── items_test.go       # HTTP Handler Tests
+└── tests/
+    ├── integration/            # Integration Tests
+    └── testdata/              # Test Fixtures
+
+frontend/
+├── src/
+│   ├── components/
+│   │   ├── ItemSearch.tsx
+│   │   └── ItemSearch.test.tsx
+│   └── services/
+│       ├── api.ts
+│       └── api.test.ts
+└── __tests__/
+    └── e2e/                   # End-to-End Tests
+```
 
 ### Zu testende Bereiche:
 1. **Komponenten:** Visual Regression Tests

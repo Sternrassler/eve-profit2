@@ -78,10 +78,11 @@ GitHub Copilot kann **NICHT automatisch** Arbeit nach Session-Unterbrechungen wi
 ```
 1. 🎯 Ziel definieren: "Implementiere ESI Client mit Character API"
 2. 📝 Plan erstellen: "Welche Dateien/Funktionen sind nötig?"
-3. ⏱️ Zeitschätzung: "Etwa 45 Minuten für Grundimplementierung"
-4. 🔨 Implementation: Schritt-für-Schritt Umsetzung
-5. 📊 Checkpoint: Status dokumentieren
-6. ✅ Test: Funktionalität validieren
+3. 🧪 Test schreiben: "Test-First Approach (TDD)"
+4. ⏱️ Zeitschätzung: "Etwa 45 Minuten für Grundimplementierung"
+5. 🔨 Implementation: Schritt-für-Schritt Umsetzung (Red-Green-Refactor)
+6. 📊 Checkpoint: Status dokumentieren
+7. ✅ Test: Funktionalität validieren + Integration Tests
 ```
 
 ### **Signalwörter für Checkpoints:**
@@ -175,7 +176,12 @@ Analysiere die letzten Änderungen, prüfe auf Fehler und setze die Implementati
 
 ### **Für Testing-Phase:**
 ```
-Prüfe alle implementierten Features auf Funktionalität und erstelle Tests für noch nicht getestete Bereiche.
+Implementiere TDD-Workflow: Schreibe Tests vor Code, führe Red-Green-Refactor Cycle durch und prüfe Code Coverage.
+```
+
+### **Für Test-First Development:**
+```
+Beginne mit Test-Driven Development für [spezifische Funktion]. Schreibe zuerst den Test, dann die minimale Implementierung.
 ```
 
 ## 🛡️ **Präventive Maßnahmen**

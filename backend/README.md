@@ -91,6 +91,19 @@ internal/
 3. **ESI Client:** EVE API Integration mit Rate Limiting
 4. **Business Logic:** Profit Calculation Engine
 
+## 🔄 Git Workflow
+
+Nach jeder abgeschlossenen Entwicklungsphase:
+```bash
+cd .. && ./commit-phase.sh 2 "SDE Client Implementation" "SQLite integration completed"
+```
+
+## 📊 Development Tracking
+
+- **Repository:** https://github.com/Sternrassler/eve-profit2
+- **Git-Historie:** Jeder Commit = Abgeschlossene Phase
+- **Status:** Siehe [../STATUS.md](../STATUS.md) für aktuellen Stand
+
 ---
 
 Siehe [../STATUS.md](../STATUS.md) für detaillierten Entwicklungsstand.
