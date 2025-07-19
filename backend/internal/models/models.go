@@ -28,6 +28,16 @@ type MarketHistory struct {
 	Volume     int64     `json:"volume"`
 }
 
+// TypeInfo represents type information from ESI
+type TypeInfo struct {
+	TypeID      int32   `json:"type_id"`
+	Name        string  `json:"name"`
+	Description string  `json:"description"`
+	GroupID     int32   `json:"group_id"`
+	Volume      float64 `json:"volume"`
+	Mass        float64 `json:"mass"`
+}
+
 // ItemPrice represents current market prices for an item
 type ItemPrice struct {
 	TypeID      int32     `json:"type_id"`

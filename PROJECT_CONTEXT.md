@@ -29,6 +29,22 @@
 - **Database:** SDE SQLite (EVE Static Data Export)
 - **OAuth:** EVE SSO für Character Authentication
 - **API Format:** JSON REST API
+- **Server Port:** 9000 (Backend), 3000 (Frontend Dev Server)
+
+### EVE ESI Application Settings
+- **Client ID:** 0928b4bcd20242aeb9b8be10f5451094
+- **Client Secret:** AQPjLZ3VYAewR59J5jStZs52dY7jISGVLwXv5NA
+- **Callback URL:** http://localhost:9000/callback
+- **Scopes:**
+  - publicData
+  - esi-location.read_location.v1
+  - esi-location.read_ship_type.v1
+  - esi-skills.read_skills.v1
+  - esi-wallet.read_character_wallet.v1
+  - esi-universe.read_structures.v1
+  - esi-assets.read_assets.v1
+  - esi-fittings.read_fittings.v1
+  - esi-characters.read_standings.v1
 
 ### Entwicklung
 - **Package Manager:** npm

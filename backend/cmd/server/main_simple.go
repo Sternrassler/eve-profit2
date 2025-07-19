@@ -40,7 +40,7 @@ func main() {
 
 	// Initialize services
 	itemService := service.NewItemService(sdeRepo, nil)
-	_ = service.NewMarketService(esiClient) // TODO: Use in handlers
+	marketService := service.NewMarketService(esiClient)
 
 	// Setup Gin router
 	if !cfg.DebugMode {
