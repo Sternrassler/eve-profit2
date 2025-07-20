@@ -1,22 +1,25 @@
-package service
+package service_test
 
 import (
 	"testing"
 
 	"eve-profit2/internal/repository"
+	"eve-profit2/internal/service"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
+const testDatabasePath = "../../../data/sqlite-latest.sqlite"
+
 // TestItemServiceGetItemByID tests the item service with real SDE data
 func TestItemServiceGetItemByID(t *testing.T) {
 	// Given: Real SDE repository and item service
-	sdeRepo, err := repository.NewSDERepository("../../data/sqlite-latest.sqlite")
+	sdeRepo, err := repository.NewSDERepository(testDatabasePath)
 	require.NoError(t, err)
 	defer sdeRepo.Close()
 
-	itemService := NewItemService(sdeRepo, nil)
+	itemService := service.NewItemService(sdeRepo, nil)
 
 	t.Run("should return item details for valid ID", func(t *testing.T) {
 		// When: Get Tritanium (TypeID: 34)
@@ -43,11 +46,11 @@ func TestItemServiceGetItemByID(t *testing.T) {
 // TestItemServiceSearchItems tests item search functionality
 func TestItemServiceSearchItems(t *testing.T) {
 	// Given: Item service with SDE
-	sdeRepo, err := repository.NewSDERepository("../../data/sqlite-latest.sqlite")
+	sdeRepo, err := repository.NewSDERepository(testDatabasePath)
 	require.NoError(t, err)
 	defer sdeRepo.Close()
 
-	itemService := NewItemService(sdeRepo, nil)
+	itemService := service.NewItemService(sdeRepo, nil)
 
 	t.Run("should find items matching search query", func(t *testing.T) {
 		// When: Search for "Tritanium" (we know this exists)

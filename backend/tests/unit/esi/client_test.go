@@ -1,4 +1,4 @@
-package esi
+package esi_test
 
 import (
 	"context"
@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"eve-profit2/internal/models"
+	"eve-profit2/pkg/esi"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -51,7 +52,7 @@ func TestESIClientGetMarketOrders(t *testing.T) {
 		defer server.Close()
 
 		// When: ESI Client fetches market orders
-		client := NewESIClient(WithBaseURL(server.URL))
+		client := esi.NewESIClient(esi.WithBaseURL(server.URL))
 		ctx := context.Background()
 
 		orders, err := client.GetMarketOrders(ctx, 10000002, 34) // The Forge, Tritanium
@@ -74,7 +75,7 @@ func TestESIClientGetMarketOrders(t *testing.T) {
 		defer server.Close()
 
 		// When: ESI Client tries to fetch data
-		client := NewESIClient(WithBaseURL(server.URL))
+		client := esi.NewESIClient(esi.WithBaseURL(server.URL))
 		ctx := context.Background()
 
 		orders, err := client.GetMarketOrders(ctx, 10000002, 34)
@@ -98,9 +99,9 @@ func TestESIClientRateLimiting(t *testing.T) {
 		}))
 		defer server.Close()
 
-		client := NewESIClient(
-			WithBaseURL(server.URL),
-			WithRateLimit(150), // 150 requests per second
+		client := esi.NewESIClient(
+			esi.WithBaseURL(server.URL),
+			esi.WithRateLimit(150), // 150 requests per second
 		)
 
 		// When: Making multiple requests rapidly
@@ -130,7 +131,7 @@ func TestESIClientRateLimiting(t *testing.T) {
 		defer server.Close()
 
 		// When: ESI Client makes request
-		client := NewESIClient(WithBaseURL(server.URL))
+		client := esi.NewESIClient(esi.WithBaseURL(server.URL))
 		ctx := context.Background()
 
 		_, err := client.GetMarketOrders(ctx, 10000002, 34)
@@ -158,9 +159,9 @@ func TestESIClientErrorHandling(t *testing.T) {
 		defer server.Close()
 
 		// When: ESI Client makes request with retry enabled
-		client := NewESIClient(
-			WithBaseURL(server.URL),
-			WithRetryAttempts(3),
+		client := esi.NewESIClient(
+			esi.WithBaseURL(server.URL),
+			esi.WithRetryAttempts(3),
 		)
 		ctx := context.Background()
 
@@ -182,7 +183,7 @@ func TestESIClientErrorHandling(t *testing.T) {
 		defer server.Close()
 
 		// When: ESI Client with short timeout
-		client := NewESIClient(WithBaseURL(server.URL))
+		client := esi.NewESIClient(esi.WithBaseURL(server.URL))
 		ctx, cancel := context.WithTimeout(context.Background(), 50*time.Millisecond)
 		defer cancel()
 
@@ -209,7 +210,7 @@ func TestESIClientParallelRequests(t *testing.T) {
 		defer server.Close()
 
 		// When: Making multiple concurrent requests
-		client := NewESIClient(WithBaseURL(server.URL))
+		client := esi.NewESIClient(esi.WithBaseURL(server.URL))
 		ctx := context.Background()
 
 		// Test concurrent requests to different regions

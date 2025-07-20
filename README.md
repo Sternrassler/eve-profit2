@@ -28,10 +28,11 @@ Check the [`docs/`](./docs/) directory for any additional project documentation.
 ## ⚠️ Before Starting Development
 
 **Required Reading:**
-1. **[Project Status](./docs/PROJECT_STATUS.md)** - Check current development phase
-2. **[Universal Development Guidelines](./docs/UNIVERSAL_DEVELOPMENT_GUIDELINES.md)** - Project structure and standards
-3. **[Universal Clean Code Guidelines](./docs/UNIVERSAL_CLEAN_CODE_GUIDELINES.md)** - Code quality standards
-4. **[Universal Testing Guidelines](./docs/UNIVERSAL_TESTING_GUIDELINES.md)** - TDD workflow
+1. **[Project Status](./docs/PROJECT_STATUS.md)** - Current development phase and priorities
+2. **[Universal Development Guidelines](./docs/UNIVERSAL_DEVELOPMENT_GUIDELINES.md)** - Required project structure and standards
+3. **[Universal Clean Code Guidelines](./docs/UNIVERSAL_CLEAN_CODE_GUIDELINES.md)** - Code quality and SOLID principles
+4. **[Universal Testing Guidelines](./docs/UNIVERSAL_TESTING_GUIDELINES.md)** - TDD workflow and testing standards
+5. **[Project Context](./docs/PROJECT_CONTEXT.md)** - Project background and objectives
 
 ## 🏗️ Project Structure
 
@@ -68,13 +69,6 @@ go test ./...
 ```
 
 ## 📚 Development
-
-Before starting development, please read:
-1. **[Project Status](./docs/PROJECT_STATUS.md)** - Current development phase and priorities
-2. **[Universal Development Guidelines](./docs/UNIVERSAL_DEVELOPMENT_GUIDELINES.md)** - Required project structure and standards
-3. **[Universal Clean Code Guidelines](./docs/UNIVERSAL_CLEAN_CODE_GUIDELINES.md)** - Code quality and SOLID principles
-4. **[Universal Testing Guidelines](./docs/UNIVERSAL_TESTING_GUIDELINES.md)** - TDD workflow and testing standards
-5. **[Project Context](./docs/PROJECT_CONTEXT.md)** - Project background and objectives
 
 ### Development Workflow
 1. Check **[Project Status](./docs/PROJECT_STATUS.md)** for current phase

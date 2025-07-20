@@ -1,4 +1,4 @@
-package esi
+package esi_test
 
 import (
 	"context"
@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"eve-profit2/internal/models"
+	"eve-profit2/pkg/esi"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -46,7 +47,7 @@ func TestESIClientGetMarketHistory(t *testing.T) {
 		defer server.Close()
 
 		// When: ESI Client fetches market history
-		client := NewESIClient(WithBaseURL(server.URL))
+		client := esi.NewESIClient(esi.WithBaseURL(server.URL))
 		ctx := context.Background()
 
 		history, err := client.GetMarketHistory(ctx, 10000002, 34) // The Forge, Tritanium
@@ -68,7 +69,7 @@ func TestESIClientGetMarketHistory(t *testing.T) {
 		defer server.Close()
 
 		// When: ESI Client tries to fetch data
-		client := NewESIClient(WithBaseURL(server.URL))
+		client := esi.NewESIClient(esi.WithBaseURL(server.URL))
 		ctx := context.Background()
 
 		history, err := client.GetMarketHistory(ctx, 10000002, 34)
@@ -103,7 +104,7 @@ func TestESIClientGetTypeInfo(t *testing.T) {
 		defer server.Close()
 
 		// When: ESI Client fetches type info
-		client := NewESIClient(WithBaseURL(server.URL))
+		client := esi.NewESIClient(esi.WithBaseURL(server.URL))
 		ctx := context.Background()
 
 		typeInfo, err := client.GetTypeInfo(ctx, 34) // Tritanium
@@ -124,7 +125,7 @@ func TestESIClientGetTypeInfo(t *testing.T) {
 		defer server.Close()
 
 		// When: ESI Client tries to fetch invalid type
-		client := NewESIClient(WithBaseURL(server.URL))
+		client := esi.NewESIClient(esi.WithBaseURL(server.URL))
 		ctx := context.Background()
 
 		typeInfo, err := client.GetTypeInfo(ctx, 999999)
@@ -145,7 +146,7 @@ func TestESIClientBatchOperations(t *testing.T) {
 		defer server.Close()
 
 		// When: Requesting data for multiple types
-		client := NewESIClient(WithBaseURL(server.URL))
+		client := esi.NewESIClient(esi.WithBaseURL(server.URL))
 		ctx := context.Background()
 
 		typeIDs := []int32{34, 35, 36} // Tritanium, Pyerite, Mexallon
@@ -179,7 +180,7 @@ func createBatchTestServer(requestLog *[]string) *httptest.Server {
 }
 
 // executeBatchRequests performs concurrent market data requests
-func executeBatchRequests(ctx context.Context, client *ESIClient, regionID int32, typeIDs []int32) int {
+func executeBatchRequests(ctx context.Context, client *esi.ESIClient, regionID int32, typeIDs []int32) int {
 	results := make(chan error, len(typeIDs)*2)
 
 	for _, typeID := range typeIDs {
@@ -191,13 +192,13 @@ func executeBatchRequests(ctx context.Context, client *ESIClient, regionID int32
 }
 
 // makeOrderRequest performs a single order request
-func makeOrderRequest(ctx context.Context, client *ESIClient, regionID, typeID int32, results chan<- error) {
+func makeOrderRequest(ctx context.Context, client *esi.ESIClient, regionID, typeID int32, results chan<- error) {
 	_, err := client.GetMarketOrders(ctx, regionID, typeID)
 	results <- err
 }
 
 // makeHistoryRequest performs a single history request
-func makeHistoryRequest(ctx context.Context, client *ESIClient, regionID, typeID int32, results chan<- error) {
+func makeHistoryRequest(ctx context.Context, client *esi.ESIClient, regionID, typeID int32, results chan<- error) {
 	_, err := client.GetMarketHistory(ctx, regionID, typeID)
 	results <- err
 }

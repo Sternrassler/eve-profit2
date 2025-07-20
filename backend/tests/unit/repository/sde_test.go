@@ -1,15 +1,19 @@
-package repository
+package repository_test
 
 import (
 	"testing"
+
+	"eve-profit2/internal/repository"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func TestSDERepository_GetItemByID(t *testing.T) {
+const testDatabasePath = "../../../data/sqlite-latest.sqlite"
+
+func TestSDERepositoryGetItemByID(t *testing.T) {
 	// Arrange
-	repo, err := NewSDERepository("../../data/sqlite-latest.sqlite")
+	repo, err := repository.NewSDERepository("../../../data/sqlite-latest.sqlite")
 	require.NoError(t, err)
 	defer repo.Close()
 
@@ -25,9 +29,9 @@ func TestSDERepository_GetItemByID(t *testing.T) {
 	assert.True(t, item.Published)
 }
 
-func TestSDERepository_GetItemByID_NotFound(t *testing.T) {
+func TestSDERepositoryGetItemByIDNotFound(t *testing.T) {
 	// Arrange
-	repo, err := NewSDERepository("../../data/sqlite-latest.sqlite")
+	repo, err := repository.NewSDERepository(testDatabasePath)
 	require.NoError(t, err)
 	defer repo.Close()
 
@@ -40,9 +44,9 @@ func TestSDERepository_GetItemByID_NotFound(t *testing.T) {
 	assert.Contains(t, err.Error(), "item not found")
 }
 
-func TestSDERepository_SearchItems(t *testing.T) {
+func TestSDERepositorySearchItems(t *testing.T) {
 	// Arrange
-	repo, err := NewSDERepository("../../data/sqlite-latest.sqlite")
+	repo, err := repository.NewSDERepository(testDatabasePath)
 	require.NoError(t, err)
 	defer repo.Close()
 
@@ -61,9 +65,9 @@ func TestSDERepository_SearchItems(t *testing.T) {
 	}
 }
 
-func TestSDERepository_Database_Connection(t *testing.T) {
+func TestSDERepositoryDatabaseConnection(t *testing.T) {
 	// Arrange & Act
-	repo, err := NewSDERepository("../../data/sqlite-latest.sqlite")
+	repo, err := repository.NewSDERepository(testDatabasePath)
 	require.NoError(t, err)
 	defer repo.Close()
 
