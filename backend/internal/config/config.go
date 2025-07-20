@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -106,6 +107,8 @@ func getEnvInt(key string, defaultValue int) int {
 		if intVal, err := strconv.Atoi(value); err == nil {
 			return intVal
 		}
+		// Log warning for invalid values but continue with default
+		fmt.Printf("Warning: Invalid integer value for %s: %s, using default: %d\n", key, value, defaultValue)
 	}
 	return defaultValue
 }
@@ -115,6 +118,8 @@ func getEnvBool(key string, defaultValue bool) bool {
 		if boolVal, err := strconv.ParseBool(value); err == nil {
 			return boolVal
 		}
+		// Log warning for invalid values but continue with default
+		fmt.Printf("Warning: Invalid boolean value for %s: %s, using default: %t\n", key, value, defaultValue)
 	}
 	return defaultValue
 }

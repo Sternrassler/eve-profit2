@@ -26,6 +26,33 @@ func NewMarketService(esiClient ESIClient) *MarketService {
 	}
 }
 
+// getCacheKey generates a cache key for market data
+func (s *MarketService) getCacheKey(regionID int32, typeIDs []int32) string {
+	return fmt.Sprintf("market_%d_%v", regionID, typeIDs)
+}
+
+// getCachedData retrieves data from cache if available and not expired
+func (s *MarketService) getCachedData(key string) (*MarketDataResponse, bool) {
+	s.cacheMux.RLock()
+	defer s.cacheMux.RUnlock()
+
+	if data, exists := s.cache[key]; exists {
+		if response, ok := data.(*MarketDataResponse); ok {
+			if time.Since(response.UpdatedAt) < s.cacheTTL {
+				return response, true
+			}
+		}
+	}
+	return nil, false
+}
+
+// setCachedData stores data in cache
+func (s *MarketService) setCachedData(key string, data *MarketDataResponse) {
+	s.cacheMux.Lock()
+	defer s.cacheMux.Unlock()
+	s.cache[key] = data
+}
+
 // MarketDataRequest represents a request for market data
 type MarketDataRequest struct {
 	RegionID int32   `json:"region_id"`
@@ -43,53 +70,56 @@ type MarketDataResponse struct {
 
 // GetMarketData retrieves comprehensive market data for specified types in a region
 func (s *MarketService) GetMarketData(ctx context.Context, req MarketDataRequest) (*MarketDataResponse, error) {
+	if err := s.validateMarketDataRequest(req); err != nil {
+		return nil, err
+	}
+
+	// Check cache first
+	cacheKey := s.getCacheKey(req.RegionID, req.TypeIDs)
+	if cachedData, found := s.getCachedData(cacheKey); found {
+		return cachedData, nil
+	}
+
+	results, err := s.fetchMarketDataConcurrently(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	response := s.aggregateMarketDataResponse(req.RegionID, results)
+	s.setCachedData(cacheKey, response)
+
+	return response, nil
+}
+
+// validateMarketDataRequest validates the market data request
+func (s *MarketService) validateMarketDataRequest(req MarketDataRequest) error {
 	if len(req.TypeIDs) == 0 {
-		return nil, fmt.Errorf("no type IDs provided")
+		return fmt.Errorf("no type IDs provided")
 	}
-
-	response := &MarketDataResponse{
-		RegionID:  req.RegionID,
-		Data:      make(map[int32]*models.ItemPrice),
-		Orders:    make(map[int32][]models.MarketOrder),
-		History:   make(map[int32][]models.MarketHistory),
-		UpdatedAt: time.Now(),
+	if req.RegionID <= 0 {
+		return fmt.Errorf("invalid region ID: %d", req.RegionID)
 	}
+	return nil
+}
 
-	// Process each type ID concurrently
-	type result struct {
-		typeID  int32
-		orders  []models.MarketOrder
-		history []models.MarketHistory
-		err     error
-	}
+// marketDataResult represents the result of fetching data for a single type
+type marketDataResult struct {
+	typeID  int32
+	orders  []models.MarketOrder
+	history []models.MarketHistory
+	err     error
+}
 
-	results := make(chan result, len(req.TypeIDs))
+// fetchMarketDataConcurrently fetches market data for all type IDs concurrently
+func (s *MarketService) fetchMarketDataConcurrently(ctx context.Context, req MarketDataRequest) ([]marketDataResult, error) {
+	results := make(chan marketDataResult, len(req.TypeIDs))
 	var wg sync.WaitGroup
 
 	for _, typeID := range req.TypeIDs {
 		wg.Add(1)
 		go func(tid int32) {
 			defer wg.Done()
-
-			// Fetch orders
-			orders, err := s.esiClient.GetMarketOrders(ctx, req.RegionID, tid)
-			if err != nil {
-				results <- result{typeID: tid, err: fmt.Errorf("failed to get orders for type %d: %w", tid, err)}
-				return
-			}
-
-			// Fetch history
-			history, err := s.esiClient.GetMarketHistory(ctx, req.RegionID, tid)
-			if err != nil {
-				results <- result{typeID: tid, err: fmt.Errorf("failed to get history for type %d: %w", tid, err)}
-				return
-			}
-
-			results <- result{
-				typeID:  tid,
-				orders:  orders,
-				history: history,
-			}
+			s.fetchSingleTypeMarketData(ctx, req.RegionID, tid, results)
 		}(typeID)
 	}
 
@@ -98,12 +128,61 @@ func (s *MarketService) GetMarketData(ctx context.Context, req MarketDataRequest
 		close(results)
 	}()
 
-	// Collect results and aggregate data
+	return s.collectMarketDataResults(results)
+}
+
+// fetchSingleTypeMarketData fetches market data for a single type ID
+func (s *MarketService) fetchSingleTypeMarketData(ctx context.Context, regionID, typeID int32, results chan<- marketDataResult) {
+	orders, err := s.esiClient.GetMarketOrders(ctx, regionID, typeID)
+	if err != nil {
+		results <- marketDataResult{
+			typeID: typeID,
+			err:    fmt.Errorf("failed to get orders for type %d: %w", typeID, err),
+		}
+		return
+	}
+
+	history, err := s.esiClient.GetMarketHistory(ctx, regionID, typeID)
+	if err != nil {
+		results <- marketDataResult{
+			typeID: typeID,
+			err:    fmt.Errorf("failed to get history for type %d: %w", typeID, err),
+		}
+		return
+	}
+
+	results <- marketDataResult{
+		typeID:  typeID,
+		orders:  orders,
+		history: history,
+	}
+}
+
+// collectMarketDataResults collects and validates all market data results
+func (s *MarketService) collectMarketDataResults(results <-chan marketDataResult) ([]marketDataResult, error) {
+	var collectedResults []marketDataResult
+
 	for res := range results {
 		if res.err != nil {
 			return nil, res.err
 		}
+		collectedResults = append(collectedResults, res)
+	}
 
+	return collectedResults, nil
+}
+
+// aggregateMarketDataResponse aggregates results into the final response
+func (s *MarketService) aggregateMarketDataResponse(regionID int32, results []marketDataResult) *MarketDataResponse {
+	response := &MarketDataResponse{
+		RegionID:  regionID,
+		Data:      make(map[int32]*models.ItemPrice),
+		Orders:    make(map[int32][]models.MarketOrder),
+		History:   make(map[int32][]models.MarketHistory),
+		UpdatedAt: time.Now(),
+	}
+
+	for _, res := range results {
 		response.Orders[res.typeID] = res.orders
 		response.History[res.typeID] = res.history
 
@@ -114,7 +193,7 @@ func (s *MarketService) GetMarketData(ctx context.Context, req MarketDataRequest
 		response.Data[res.typeID] = itemPrice
 	}
 
-	return response, nil
+	return response
 }
 
 // calculateItemPrice aggregates market orders into current price information
