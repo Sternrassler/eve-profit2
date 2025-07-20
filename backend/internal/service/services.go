@@ -263,6 +263,10 @@ func (s *ItemService) GetItemByID(typeID int32) (*models.Item, error) {
 
 	sdeItem, err := s.sdeRepo.GetItemByID(typeID)
 	if err != nil {
+		// Check if item was not found
+		if err.Error() == fmt.Sprintf("item not found: typeID %d", typeID) {
+			return nil, ErrItemNotFound
+		}
 		return nil, err
 	}
 
@@ -279,20 +283,20 @@ func (s *ItemService) GetItemByID(typeID int32) (*models.Item, error) {
 }
 
 // SearchItems searches for items by name pattern
-func (s *ItemService) SearchItems(pattern string, limit int) ([]models.Item, error) {
+func (s *ItemService) SearchItems(pattern string) ([]*models.Item, error) {
 	if s.sdeRepo == nil {
 		return nil, fmt.Errorf("SDE repository not available")
 	}
 
-	sdeItems, err := s.sdeRepo.SearchItems(pattern, limit)
+	sdeItems, err := s.sdeRepo.SearchItems(pattern, 50) // Default limit of 50
 	if err != nil {
 		return nil, err
 	}
 
-	// Convert SDE items to models.Item
-	var items []models.Item
+	// Convert SDE items to models.Item pointers
+	var items []*models.Item
 	for _, sdeItem := range sdeItems {
-		item := models.Item{
+		item := &models.Item{
 			TypeID:   sdeItem.TypeID,
 			TypeName: sdeItem.TypeName,
 			GroupID:  sdeItem.GroupID,

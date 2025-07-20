@@ -54,12 +54,12 @@ func TestItemServiceSearchItems(t *testing.T) {
 
 	t.Run("should find items matching search query", func(t *testing.T) {
 		// When: Search for "Tritanium" (we know this exists)
-		items, err := itemService.SearchItems("Tritanium", 5)
+		items, err := itemService.SearchItems("Tritanium")
 
 		// Then: Should return results
 		assert.NoError(t, err)
 		assert.NotEmpty(t, items)
-		assert.LessOrEqual(t, len(items), 5)
+		assert.LessOrEqual(t, len(items), 50) // Default limit is now 50
 
 		// Should contain Tritanium
 		found := false
