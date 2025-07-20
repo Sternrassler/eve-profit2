@@ -160,35 +160,34 @@ describe('Order Total Calculation', () => {
 
 ### Test-Organisation (Universell)
 
+#### Projekt-Struktur-Mapping
+**📖 Siehe: `UNIVERSAL_DEVELOPMENT_GUIDELINES.md` - Projekt-Organisation**
+
+Tests folgen der gleichen Backend/Frontend-Trennung wie die Projekt-Struktur:
+
 ```
 project-root/
-├── src/                    # Source Code
-│   ├── components/         # UI Components (Frontend)
-│   ├── services/          # Business Logic
-│   ├── repositories/      # Data Access Layer
-│   ├── models/           # Data Models/Entities
-│   └── utils/            # Helper Functions
-├── tests/                 # Test Files
-│   ├── unit/             # Unit Tests (Einzelne Funktionen/Klassen)
-│   │   ├── services/     # Tests für src/services/
-│   │   ├── models/       # Tests für src/models/
-│   │   └── utils/        # Tests für src/utils/
-│   ├── integration/      # Integration Tests (Komponenten-Zusammenspiel)
-│   │   ├── api/          # API Integration Tests
-│   │   ├── database/     # Database Integration Tests
-│   │   └── services/     # Service Integration Tests
-│   ├── e2e/              # End-to-End Tests (User Workflows)
-│   │   ├── auth/         # Authentication Workflows
-│   │   ├── checkout/     # Purchase/Checkout Workflows
-│   │   └── registration/ # User Registration Workflows
-│   └── fixtures/         # Test Data
-│       ├── users.json    # User Test Data
-│       ├── products.json # Product Test Data
-│       └── orders.json   # Order Test Data
-├── docs/                 # Documentation
-├── config/               # Configuration Files
-└── scripts/              # Build/Deploy Scripts
+├── backend/
+│   ├── internal/          # Source Code
+│   └── tests/             # Backend Tests (spiegelt internal/ wider)
+│       ├── unit/          # Unit Tests
+│       ├── integration/   # Integration Tests  
+│       └── fixtures/      # Test Data
+├── frontend/
+│   ├── src/               # Source Code
+│   └── tests/             # Frontend Tests (spiegelt src/ wider)
+│       ├── unit/          # Unit Tests
+│       ├── integration/   # Integration Tests
+│       ├── e2e/           # End-to-End Tests
+│       └── fixtures/      # Test Data
+└── docs/                  # Documentation
 ```
+
+#### Test-Struktur-Prinzipien:
+- **Mirror Source Structure:** Test-Verzeichnisse spiegeln Source-Code-Struktur wider
+- **Co-location:** Tests befinden sich nahe dem zu testenden Code
+- **Separation of Concerns:** Backend- und Frontend-Tests sind getrennt
+- **Test Types:** Unit → Integration → E2E (von innen nach außen)
 
 ### Test-Naming Conventions
 

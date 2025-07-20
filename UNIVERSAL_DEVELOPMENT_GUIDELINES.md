@@ -68,34 +68,59 @@ docs(readme): update installation instructions
 ## 🎨 Universelle Code-Struktur Standards
 
 ### Projekt-Organisation
+
+#### Moderne Backend/Frontend-Trennung
 ```
 project-root/
-├── src/                    # Source Code
-│   ├── components/         # UI Components (Frontend)
-│   ├── services/          # Business Logic
-│   ├── repositories/      # Data Access Layer
-│   ├── models/           # Data Models/Entities
-│   └── utils/            # Helper Functions
-├── tests/                 # Test Files
-│   ├── unit/             # Unit Tests (Einzelne Funktionen/Klassen)
-│   │   ├── services/     # Tests für src/services/
-│   │   ├── models/       # Tests für src/models/
-│   │   └── utils/        # Tests für src/utils/
-│   ├── integration/      # Integration Tests (Komponenten-Zusammenspiel)
-│   │   ├── api/          # API Integration Tests
-│   │   ├── database/     # Database Integration Tests
-│   │   └── services/     # Service Integration Tests
-│   ├── e2e/              # End-to-End Tests (User Workflows)
-│   │   ├── auth/         # Authentication Workflows
-│   │   ├── checkout/     # Purchase/Checkout Workflows
-│   │   └── registration/ # User Registration Workflows
-│   └── fixtures/         # Test Data
-│       ├── users.json    # User Test Data
-│       ├── products.json # Product Test Data
-│       └── orders.json   # Order Test Data
-├── docs/                 # Documentation
-├── config/               # Configuration Files
-└── scripts/              # Build/Deploy Scripts
+├── backend/                # Backend Services
+│   ├── cmd/               # Entry Points (main.go, etc.)
+│   │   └── server/        # Server Startup
+│   ├── internal/          # Private Application Code
+│   │   ├── api/           # API Layer (REST/GraphQL Handlers)
+│   │   │   ├── handlers/  # HTTP Request Handlers
+│   │   │   └── middleware/# HTTP Middleware
+│   │   ├── service/       # Business Logic Services
+│   │   ├── repository/    # Data Access Layer
+│   │   ├── models/        # Data Models/Entities
+│   │   ├── config/        # Configuration Management
+│   │   └── cache/         # Caching Layer
+│   ├── pkg/               # Public Libraries (shared packages)
+│   ├── tests/             # Backend Tests
+│   │   ├── unit/          # Unit Tests
+│   │   ├── integration/   # Integration Tests
+│   │   └── fixtures/      # Test Data
+│   └── scripts/           # Backend Build/Deploy Scripts
+├── frontend/              # Frontend Application
+│   ├── src/               # Source Code
+│   │   ├── components/    # UI Components
+│   │   ├── pages/         # Page Components
+│   │   ├── services/      # API Client Services
+│   │   ├── stores/        # State Management
+│   │   ├── utils/         # Helper Functions
+│   │   └── types/         # TypeScript Type Definitions
+│   ├── tests/             # Frontend Tests
+│   │   ├── unit/          # Component Unit Tests
+│   │   ├── integration/   # Component Integration Tests
+│   │   └── e2e/           # End-to-End Tests
+│   └── public/            # Static Assets
+├── docs/                  # Project Documentation
+├── config/                # Shared Configuration
+└── scripts/               # Shared Scripts
+```
+
+#### Alternative: Monorepo-Struktur
+```
+project-root/
+├── apps/                  # Applications
+│   ├── api/              # Backend API
+│   ├── web/              # Frontend Web App
+│   └── mobile/           # Mobile App (optional)
+├── packages/             # Shared Libraries
+│   ├── types/            # Shared Types
+│   ├── utils/            # Shared Utilities
+│   └── config/           # Shared Configuration
+├── tools/                # Development Tools
+└── docs/                 # Documentation
 ```
 
 ### Naming Conventions
