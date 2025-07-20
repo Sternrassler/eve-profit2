@@ -11,14 +11,27 @@ All project documentation is located in the [`docs/`](./docs/) directory:
 ### 📋 Project Documentation
 - **[Project Context](./docs/PROJECT_CONTEXT.md)** - Project overview and objectives
 - **[Project Status](./docs/PROJECT_STATUS.md)** - Current development status and progress
-- **[Character API Specs](./docs/CHARACTER_API_SPECS.md)** - Character API specifications
-- **[Session Management](./docs/PROJECT_SESSION_MANAGEMENT.md)** - Development session guidelines
+- **[Project Session Management](./docs/PROJECT_SESSION_MANAGEMENT.md)** - Development session guidelines
 
-### 🎯 Universal Development Guidelines
-- **[Development Guidelines](./docs/UNIVERSAL_DEVELOPMENT_GUIDELINES.md)** - Universal development standards
+### 🔧 API & Technical Specifications  
+- **[Character API Specs](./docs/CHARACTER_API_SPECS.md)** - Character API specifications and endpoints
+
+### 🎯 Universal Development Guidelines (Must Read!)
+- **[Development Guidelines](./docs/UNIVERSAL_DEVELOPMENT_GUIDELINES.md)** - Universal development standards and project structure
 - **[Clean Code Guidelines](./docs/UNIVERSAL_CLEAN_CODE_GUIDELINES.md)** - Clean Code and SOLID principles
 - **[Testing Guidelines](./docs/UNIVERSAL_TESTING_GUIDELINES.md)** - TDD and testing best practices
 - **[Session Management Guidelines](./docs/UNIVERSAL_SESSION_MANAGEMENT_GUIDELINES.md)** - Universal session management
+
+### 📚 Additional Documentation
+Check the [`docs/`](./docs/) directory for any additional project documentation.
+
+## ⚠️ Before Starting Development
+
+**Required Reading:**
+1. **[Project Status](./docs/PROJECT_STATUS.md)** - Check current development phase
+2. **[Universal Development Guidelines](./docs/UNIVERSAL_DEVELOPMENT_GUIDELINES.md)** - Project structure and standards
+3. **[Universal Clean Code Guidelines](./docs/UNIVERSAL_CLEAN_CODE_GUIDELINES.md)** - Code quality standards
+4. **[Universal Testing Guidelines](./docs/UNIVERSAL_TESTING_GUIDELINES.md)** - TDD workflow
 
 ## 🏗️ Project Structure
 
@@ -57,9 +70,17 @@ go test ./...
 ## 📚 Development
 
 Before starting development, please read:
-1. [Universal Development Guidelines](./docs/UNIVERSAL_DEVELOPMENT_GUIDELINES.md)
-2. [Universal Testing Guidelines](./docs/UNIVERSAL_TESTING_GUIDELINES.md)
-3. [Project Context](./docs/PROJECT_CONTEXT.md)
+1. **[Project Status](./docs/PROJECT_STATUS.md)** - Current development phase and priorities
+2. **[Universal Development Guidelines](./docs/UNIVERSAL_DEVELOPMENT_GUIDELINES.md)** - Required project structure and standards
+3. **[Universal Clean Code Guidelines](./docs/UNIVERSAL_CLEAN_CODE_GUIDELINES.md)** - Code quality and SOLID principles
+4. **[Universal Testing Guidelines](./docs/UNIVERSAL_TESTING_GUIDELINES.md)** - TDD workflow and testing standards
+5. **[Project Context](./docs/PROJECT_CONTEXT.md)** - Project background and objectives
+
+### Development Workflow
+1. Check **[Project Status](./docs/PROJECT_STATUS.md)** for current phase
+2. Follow **[Universal Session Management](./docs/UNIVERSAL_SESSION_MANAGEMENT_GUIDELINES.md)** for session setup
+3. Use **[Project Session Management](./docs/PROJECT_SESSION_MANAGEMENT.md)** for project-specific guidelines
+4. Implement features following **[Universal Development Guidelines](./docs/UNIVERSAL_DEVELOPMENT_GUIDELINES.md)**
 
 ## 🎮 About EVE Online
 
