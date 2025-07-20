@@ -14,8 +14,8 @@
 ```
 
 ### EVE Application Configuration (Production-Ready)
-- **Client ID:** `0928b4bcd20242aeb9b8be10f5451094`
-- **Client Secret:** `AQPjLZ3VYAewR59J5jStZs52dY7jISGVLwXv5NA`
+- **Client ID:** `your_client_id_here`
+- **Client Secret:** `your_client_secret_here` (NIEMALS in Git!)
 - **Callback URL:** `http://localhost:9000/callback`
 
 ### Required Scopes

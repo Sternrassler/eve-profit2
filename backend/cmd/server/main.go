@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	"eve-profit2/internal/api/handlers"
 	"eve-profit2/internal/config"
 	"eve-profit2/internal/repository"
 	"eve-profit2/internal/service"
@@ -143,6 +144,11 @@ func main() {
 				"status":    "configured",
 			})
 		})
+
+		// Items API endpoints
+		itemsHandler := handlers.NewItemHandler(itemService)
+		api.GET("/items/:item_id", itemsHandler.GetItemDetails)
+		api.GET("/items/search", itemsHandler.SearchItems)
 	}
 
 	// Start server

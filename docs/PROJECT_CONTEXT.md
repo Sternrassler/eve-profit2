@@ -42,8 +42,8 @@
 - **Server Port:** 9000 (Backend), 3000 (Frontend Dev Server)
 
 ### EVE ESI Application Settings
-- **Client ID:** 0928b4bcd20242aeb9b8be10f5451094
-- **Client Secret:** AQPjLZ3VYAewR59J5jStZs52dY7jISGVLwXv5NA
+- **Client ID:** your_client_id_here
+- **Client Secret:** your_client_secret_here (VERTRAULICH!)
 - **Callback URL:** http://localhost:9000/callback
 - **Scopes:**
   - publicData

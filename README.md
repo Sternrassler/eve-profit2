@@ -15,6 +15,7 @@ All project documentation is located in the [`docs/`](./docs/) directory:
 
 ### 🔧 API & Technical Specifications  
 - **[Character API Specs](./docs/CHARACTER_API_SPECS.md)** - Character API specifications and endpoints
+- **[Project Security Guidelines](./docs/PROJECT_SECURITY_GUIDELINES.md)** - 🔒 **Security configuration for EVE ESI credentials**
 
 ### 🎯 Universal Development Guidelines (Must Read!)
 - **[Development Guidelines](./docs/UNIVERSAL_DEVELOPMENT_GUIDELINES.md)** - Universal development standards and project structure

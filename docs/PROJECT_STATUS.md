@@ -1,7 +1,7 @@
 # EVE Profit Calculator 2.0 - Entwicklungsstatus
 
 > **Letzte Aktualisierung:** 20. Juli 2025  
-> **Aktuelle Phase:** Phase 4 API Handlers 🚧 IN PROGRESS  
+> **Aktuelle Phase:** Phase 4 API Handlers 🚧 IN PROGRESS (Items Handler ✅ Complete)  
 > **Entwickler:** Karsten Flache  
 > **Entwicklungsmethodik:** Clean Code + Test-Driven Development (TDD) + SonarQube Integration
 
@@ -60,7 +60,7 @@
 
 ### Phase 3: ESI Integration ✅
 **EVE ESI Client mit Production-Features**
-- ✅ **EVE Application Settings:** Client ID `0928b4bcd20242aeb9b8be10f5451094`
+- ✅ **EVE Application Settings:** Client ID configured
 - ✅ **ESI Client:** Rate Limiting (150 req/sec), Retry Logic, Context Support
 - ✅ **Market Service:** Parallelisierte ESI-Abfragen für Orders & History
 - ✅ **Configuration:** Zentrales Config-Management mit Environment Variables
@@ -75,6 +75,7 @@
 - ✅ **Real SDE Integration:** Live Tritanium data validation
 - ✅ **Interface-based Design:** Clean dependency injection mit Service Layer
 - ✅ **SonarQube Compliance:** camelCase naming, comprehensive assertions
+- ✅ **Security:** ESI Credential Protection Guide erstellt
 - 🚧 **Market Handler:** ESI Market Data API (nächster Schritt)
 - 🚧 **Character Handler:** EVE SSO Authentication Flow
 - 🚧 **Profit Handler:** Trading calculation business logic
@@ -106,7 +107,7 @@ backend/
 ```
 
 ### ESI Integration (Production-Ready)
-- **EVE Application:** Client ID `0928b4bcd20242aeb9b8be10f5451094`
+- **EVE Application:** Client ID configured
 - **Callback URL:** `http://localhost:9000/callback`
 - **Rate Limiting:** 150 req/sec ESI-compliant
 - **Scopes:** 9 configured (Skills, Assets, Wallet, etc.)

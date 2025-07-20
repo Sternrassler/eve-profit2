@@ -56,8 +56,8 @@ func Load() *Config {
 		LogLevel:   getEnv("LOG_LEVEL", "info"),
 
 		// EVE ESI Configuration
-		ESIClientID:     getEnv("ESI_CLIENT_ID", "0928b4bcd20242aeb9b8be10f5451094"),
-		ESIClientSecret: getEnv("ESI_CLIENT_SECRET", "AQPjLZ3VYAewR59J5jStZs52dY7jISGVLwXv5NA"),
+		ESIClientID:     getEnv("ESI_CLIENT_ID", ""),
+		ESIClientSecret: getEnv("ESI_CLIENT_SECRET", ""),
 		ESICallbackURL:  getEnv("ESI_CALLBACK_URL", "http://localhost:9000/callback"),
 		ESIBaseURL:      getEnv("ESI_BASE_URL", "https://esi.evetech.net"),
 		ESIScopes: getEnvSlice("ESI_SCOPES", []string{
