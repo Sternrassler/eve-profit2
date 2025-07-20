@@ -104,8 +104,8 @@ cd .. && ./commit-phase.sh 2 "SDE Client Implementation" "SQLite integration com
 
 - **Repository:** https://github.com/Sternrassler/eve-profit2
 - **Git-Historie:** Jeder Commit = Abgeschlossene Phase
-- **Status:** Siehe [../STATUS.md](../STATUS.md) für aktuellen Stand
+- **Status:** Siehe [../PROJECT_STATUS.md](../PROJECT_STATUS.md) für aktuellen Stand
 
 ---
 
-Siehe [../STATUS.md](../STATUS.md) für detaillierten Entwicklungsstand.
+Siehe [../PROJECT_STATUS.md](../PROJECT_STATUS.md) für detaillierten Entwicklungsstand.

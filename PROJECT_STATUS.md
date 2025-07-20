@@ -18,9 +18,10 @@
 - EVE SSO Authentication für Character-Daten
 
 ### 📚 Entwicklungsstandards
-- **Clean Code:** Selbstdokumentierender Code, SOLID Prinzipien, aussagekräftige Namen
-- **TDD:** Test-First Entwicklung, 90%+ Code Coverage, Red-Green-Refactor Zyklus
-- **Code-Qualität:** Max. 20 Zeilen pro Funktion, Single Responsibility, Dependency Injectionculator 2.0 - Entwicklungsstatus
+**Vollständige Standards siehe:**
+- `UNIVERSAL_CLEAN_CODE_GUIDELINES.md` - Clean Code + SOLID Prinzipien
+- `UNIVERSAL_TESTING_GUIDELINES.md` - TDD Red-Green-Refactor Workflows  
+- `UNIVERSAL_DEVELOPMENT_GUIDELINES.md` - Projektmanagement + Code-Review Standardsculator 2.0 - Entwicklungsstatus
 
 > **Letzte Aktualisierung:** 19. Juli 2025  
 > **Aktuelle Phase:** Phase 3 ESI Integration ✅ ABGESCHLOSSEN  
@@ -131,23 +132,18 @@ go test -v ./...        # Verbose Output
 go test -cover ./...    # Coverage Report
 ```
 
+**Weitere operative Commands siehe:** `PROJECT_SESSION_MANAGEMENT.md`
+
 ---
 
 ## 🚀 Development Environment
 
-### Server starten
-```bash
-cd backend
-go run cmd/server/main.go
-# Server: http://localhost:9000
-```
+**Für alle Development Commands siehe:** `PROJECT_SESSION_MANAGEMENT.md`
 
-### Konfiguration
-```bash
-# EVE ESI Settings sind vorkonfiguriert
-cp .env.example .env
-# Alle wichtigen Variablen sind mit Defaults gesetzt
-```
+### Quick Reference
+- **Server:** Port 9000 (`go run cmd/server/main.go`)
+- **Tests:** 18/18 bestehen (`go test ./...`)
+- **ESI Test:** `curl http://localhost:9000/api/v1/esi/test`
 
 ### Dependencies
 - **Go 1.21+**
@@ -169,18 +165,18 @@ cp .env.example .env
 - [ ] Enhanced Error Handling & Logging (TDD für alle Error Cases)
 
 **Clean Code Focus:**
-- Dependency Injection für alle Handler
-- Interface-basierte Service-Layer
+- Dependency Injection für alle Handler (siehe Universal Clean Code Reference)
+- Interface-basierte Service-Layer  
 - Self-documenting API Response Structures
 - Single Responsibility für jeden Handler
 
-### Phase 5: Frontend Development (TDD + Clean Code)
+### Phase 5: Frontend Development
 - [ ] React + TypeScript + Vite Setup mit Testing Framework
-- [ ] TDD für UI Components (React Testing Library)
+- [ ] Component Testing (React Testing Library + TDD Workflows)
 - [ ] Clean Component Architecture (Single Responsibility)
 - [ ] Backend API Integration (Port 9000) mit Error Handling
 - [ ] EVE SSO Login Flow (TDD für Authentication States)
-- [ ] Trading Dashboard UI (Clean Code Component Design)
+- [ ] Trading Dashboard UI (Clean Component Design)
 - [ ] Responsive Design (Mobile-friendly)
 
 ### Phase 6: Production Deployment
@@ -228,31 +224,12 @@ cp .env.example .env
 
 ## 🔄 Session Management
 
-### Für Phase 4 (API Handlers)
-```
-"Starte Phase 4: API Handlers Implementation. 
-Backend Foundation und ESI Integration sind abgeschlossen.
-Implementiere Market Data Handler mit ESI Service Integration."
-```
+**Für operative Commands und Wiederaufnahme siehe:** `PROJECT_SESSION_MANAGEMENT.md`
 
-### Für Frontend Setup
-```
-"Beginne Phase 5: React Frontend Setup.
-Backend läuft auf Port 9000 mit vollständiger ESI Integration.
-Erstelle Vite + TypeScript Setup mit Backend API Integration."
-```
-
-### Quick Status Check
-```bash
-# Backend testen
-cd backend && go run cmd/server/main.go
-
-# Tests ausführen  
-go test ./...
-
-# ESI Test
-curl http://localhost:9000/api/v1/esi/test
-```
+**Quick Reference:**
+- **Phase 4 fortsetzen:** API Handlers Implementation mit TDD
+- **Phase 5 starten:** React Frontend Setup mit Backend Integration
+- **Development Commands:** Server starten, Tests, ESI-Tests
 
 ---
 

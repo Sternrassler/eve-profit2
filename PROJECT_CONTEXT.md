@@ -16,11 +16,12 @@
 - **Code-Qualität:** Maintainable, self-documenting, highly tested codebase
 
 ## 📚 Code-Standards
-- **Clean Code Prinzipien:** Self-documenting code, SOLID principles, meaningful names
-- **TDD Workflow:** Red-Green-Refactor cycle for all new features
-- **Testing:** 90%+ code coverage, unit + integration tests
-- **Architecture:** Clean Architecture with dependency injection
-- **Documentation:** Living documentation through tests and clean code
+**Vollständige Entwicklungsstandards siehe:**
+- `UNIVERSAL_CLEAN_CODE_GUIDELINES.md` - Clean Code + SOLID Prinzipien
+- `UNIVERSAL_TESTING_GUIDELINES.md` - TDD Workflows + Test-Patterns
+- `UNIVERSAL_DEVELOPMENT_GUIDELINES.md` - Projektmanagement + Code-Review
+
+**Ziel:** Maintainable, self-documenting, highly tested codebase
 
 ## 🛠️ Technologie-Stack
 ### Frontend
