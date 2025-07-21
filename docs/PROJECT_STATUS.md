@@ -1,15 +1,15 @@
 # EVE Profit Calculator 2.0 - Entwicklungsstatus
 
-> **Letzte Aktualisierung:** 20. Juli 2025  
-> **Aktuelle Phase:** Phase 4 API Handlers 🚧 IN PROGRESS (Items Handler ✅ Complete)  
+> **Letzte Aktualisierung:** 21. Juli 2025  
+> **Aktuelle Phase:** Phase 5 E2E Testing ✅ ABGESCHLOSSEN  
 > **Entwickler:** Karsten Flache  
-> **Entwicklungsmethodik:** Clean Code + Test-Driven Development (TDD) + SonarQube Integration
+> **Entwicklungsmethodik:** Clean Code + Test-Driven Development (TDD) + SonarQube Integration + Full-Stack E2E
 
 ## 🎯 Projekt-Übersicht
 
 **EVE Online Profit Calculator** - Moderne Trading-Optimierung mit Character-Integration  
-**Tech Stack:** Go + Gin + ESI + SDE SQLite + React + TypeScript + Vite  
-**Code-Qualität:** Clean Code Prinzipien + TDD Red-Green-Refactor + SonarQube Code Quality Gates  
+**Tech Stack:** Go + Gin + ESI + SDE SQLite + React + TypeScript + Vite + Playwright E2E  
+**Code-Qualität:** Clean Code Prinzipien + TDD Red-Green-Refactor + SonarQube Code Quality Gates + Full-Stack E2E Testing  
 
 ### 🎯 Kernfunktionen
 - Marktdatenanalyse zwischen EVE Online Stationen
@@ -20,23 +20,9 @@
 ### 📚 Entwicklungsstandards
 **Vollständige Standards siehe:**
 - `UNIVERSAL_CLEAN_CODE_GUIDELINES.md` - Clean Code + SOLID Prinzipien
-- `UNIVERSAL_TESTING_GUIDELINES.md` - TDD Red-Green-Refactor Workflows  
-- `UNIVERSAL_DEVELOPMENT_GUIDELINES.md` - Projektmanagement + Code-Review Standardsculator 2.0 - Entwicklungsstatus
-
-> **Letzte Aktualisierung:** 19. Juli 2025  
-> **Aktuelle Phase:** Phase 3 ESI Integration ✅ ABGESCHLOSSEN  
-> **Entwickler:** Karsten Flache  
-
-## � Projekt-Übersicht
-
-**EVE Online Profit Calculator** - Moderne Trading-Optimierung mit Character-Integration  
-**Tech Stack:** Go + Gin + ESI + SDE SQLite + React + TypeScript + Vite  
-
-### 🎯 Kernfunktionen
-- Marktdatenanalyse zwischen EVE Online Stationen
-- Profit-Berechnungen für Trading-Routen mit Character Skills
-- Real-time ESI Integration mit Rate Limiting
-- EVE SSO Authentication für Character-Daten
+- `UNIVERSAL_TESTING_GUIDELINES.md` - TDD Red-Green-Refactor Workflows + E2E Testing
+- `UNIVERSAL_DEVELOPMENT_GUIDELINES.md` - Projektmanagement + Full-Stack E2E Architecture  
+- `TEST_COMPLIANCE_REPORT.md` - Aktuelle Test-Coverage + E2E Status
 
 ---
 
@@ -67,7 +53,7 @@
 - ✅ **Testing:** ~90% Coverage mit Mock ESI Client
 - ✅ **Documentation:** ESI_INTEGRATION.md + .env.example
 
-### Phase 4: API Handlers 🚧 IN PROGRESS
+### Phase 4: API Handlers ✅
 **TDD-basierte Handler Implementation**
 - ✅ **Items Handler:** GET /api/v1/items/:item_id + GET /api/v1/items/search 
 - ✅ **TDD Red-Green-Refactor:** 8/8 Unit Tests + 2/2 Integration Tests bestehen
@@ -76,9 +62,18 @@
 - ✅ **Interface-based Design:** Clean dependency injection mit Service Layer
 - ✅ **SonarQube Compliance:** camelCase naming, comprehensive assertions
 - ✅ **Security:** ESI Credential Protection Guide erstellt
-- 🚧 **Market Handler:** ESI Market Data API (nächster Schritt)
-- 🚧 **Character Handler:** EVE SSO Authentication Flow
-- 🚧 **Profit Handler:** Trading calculation business logic
+
+### Phase 5: Full-Stack E2E Testing ✅
+**Playwright E2E Testing Framework**
+- ✅ **Playwright Setup:** Multi-Browser Testing (Chromium, Firefox, WebKit)
+- ✅ **Page Object Model:** EVE-spezifische Page Objects mit Base Page
+- ✅ **Full-Stack Tests:** Backend + Frontend Integration testing
+- ✅ **API Health Tests:** 6/6 Tests bestehen (Health, Database, ESI connectivity)
+- ✅ **Auto Server Management:** Playwright startet Go-Server automatisch
+- ✅ **Test Data Factory:** EVE-spezifische Test Data mit @faker-js/faker
+- ✅ **Performance Validation:** Response time under 1 second
+- ✅ **Documentation Alignment:** Universal Testing Guidelines aktualisiert
+- ✅ **Root-Level E2E:** `/tests/e2e/` für Full-Stack validation
 
 ---
 
@@ -125,15 +120,21 @@ backend/
 - `GET /api/v1/esi/test` - ESI Connection Test
 - `GET /api/v1/sde/test` - SDE Database Test
 - `GET /api/v1/auth/login` - EVE SSO Configuration
+- `GET /api/v1/items/:item_id` - Item Details by ID
+- `GET /api/v1/items/search` - Item Search by Name
 
 ---
 
 ## 🧪 Test Status
 
 ### Test Coverage
-- **Gesamt:** 31/32 Tests bestehen ✅ (1 intentional skip)
-- **Unit Tests:** 23 Tests across 7 modules (cache, config, esi, handlers, models, repository, service)
-- **Integration Tests:** 7 Tests (API, Database, Cache, ESI, Items Handler)
+- **Backend Tests:** 31/32 Tests bestehen ✅ (1 intentional skip)
+  - **Unit Tests:** 23 Tests across 7 modules (cache, config, esi, handlers, models, repository, service)
+  - **Integration Tests:** 7 Tests (API, Database, Cache, ESI, Items Handler)
+- **Full-Stack E2E Tests:** 6/6 Tests bestehen ✅
+  - **API Health Tests:** Backend connectivity, Database, ESI API
+  - **Performance Tests:** Response time validation (<1s)
+  - **Multi-Browser:** Chromium, Firefox, WebKit support
 - **SDE Repository:** 100% Coverage
 - **ESI Client:** Vollständig mit Mocks getestet
 - **Market Service:** Business Logic validiert
@@ -142,10 +143,16 @@ backend/
 
 ### Test Commands
 ```bash
+# Backend Tests
 cd backend
 go test ./...           # Alle Tests ausführen
 go test -v ./...        # Verbose Output
 go test -cover ./...    # Coverage Report
+
+# E2E Tests
+npx playwright test                    # All E2E tests
+npx playwright test --project=chromium # Single browser
+npx playwright test --ui               # Interactive mode
 ```
 
 **Weitere operative Commands siehe:** `PROJECT_SESSION_MANAGEMENT.md`
@@ -157,47 +164,48 @@ go test -cover ./...    # Coverage Report
 **Für alle Development Commands siehe:** `PROJECT_SESSION_MANAGEMENT.md`
 
 ### Quick Reference
-- **Server:** Port 9000 (`go run cmd/server/main.go`)
-- **Tests:** 18/18 bestehen (`go test ./...`)
-- **ESI Test:** `curl http://localhost:9000/api/v1/esi/test`
+- **Backend Server:** Port 9000 (`cd backend && go run cmd/server/main.go`)
+- **Backend Tests:** `cd backend && go test ./...` (31/32 pass)
+- **E2E Tests:** `npx playwright test` (6/6 pass)
+- **API Health:** `curl http://localhost:9000/api/v1/health`
 
 ### Dependencies
-- **Go 1.21+**
-- **SQLite3** (für SDE Database)
-- **curl** (für SDE Download via `./download-sde.sh`)
+- **Go 1.21+** (Backend)
+- **Node.js 18+** (E2E Testing)
+- **SQLite3** (SDE Database)
+- **Playwright** (E2E Testing Framework)
 
 ---
 
 ## 📋 Nächste Phasen
 
-### Phase 4: API Handlers 🚧 IN PROGRESS
-**Status:** Items Handler ✅ Complete, Market Handler Next
+### Phase 6: Frontend Development 🚧 NEXT
+**React + TypeScript + Vite Frontend**
 
-**TDD-Implementierung:**
-- ✅ **Items Handler:** GET /api/v1/items/:id + /search (TDD + SDE Integration)
-- 🚧 **Market Data Handler:** GET /api/v1/market/orders + /history (TDD + ESI Service Integration)
+**Geplante Implementierung:**
+- 🚧 **React Setup:** Vite + TypeScript + ESLint + Prettier
+- 🚧 **API Client:** Axios-basierter Service Layer für Backend Integration
 - ⏳ **Character Auth Handler:** EVE SSO OAuth Flow (TDD + Authentication)
 - ⏳ **Profit Calculation Handler:** Trading calculations (TDD + Business Logic)
-- ✅ **Error Handling & Response Structure:** Consistent JSON API responses
+**Geplante Implementierung:**
+- 🚧 **React Setup:** Vite + TypeScript + ESLint + Prettier
+- 🚧 **API Client:** Axios-basierter Service Layer für Backend Integration
+- 🚧 **Component Testing:** React Testing Library + TDD Workflows
+- 🚧 **Clean Component Architecture:** Single Responsibility Pattern
+- 🚧 **EVE SSO Integration:** Authentication Flow mit Backend
+- 🚧 **Trading Dashboard:** User Interface für Market Analysis
+- 🚧 **Responsive Design:** Mobile-friendly EVE Trading Interface
 
-**Clean Code Achievements:**
-- ✅ Dependency Injection mit Interface-based Service Layer
-- ✅ Self-documenting API Response Structures (`{"success": bool, "data": any, "error": string}`)
-- ✅ Single Responsibility: Ein Handler pro Funktionsbereich
-- ✅ TDD Red-Green-Refactor: 8/8 Tests + Integration validation
+### Phase 7: Additional API Handlers 🚧 FUTURE
+**Backend API Expansion**
+- 🚧 **Market Data Handler:** GET /api/v1/market/orders + /history (ESI Integration)
+- 🚧 **Character Handler:** EVE SSO Authentication Flow + Character Data
+- 🚧 **Profit Handler:** Trading calculation business logic
+- 🚧 **Route Handler:** Multi-hop trading route optimization
 
-### Phase 5: Frontend Development
-- [ ] React + TypeScript + Vite Setup mit Testing Framework
-- [ ] Component Testing (React Testing Library + TDD Workflows)
-- [ ] Clean Component Architecture (Single Responsibility)
-- [ ] Backend API Integration (Port 9000) mit Error Handling
-- [ ] EVE SSO Login Flow (TDD für Authentication States)
-- [ ] Trading Dashboard UI (Clean Component Design)
-- [ ] Responsive Design (Mobile-friendly)
-
-### Phase 6: Production Deployment
+### Phase 8: Production Deployment 🚧 FUTURE
 - [ ] Docker Setup
-- [ ] CI/CD Pipeline
+- [ ] CI/CD Pipeline  
 - [ ] Performance Optimierung
 - [ ] Security Hardening
 - [ ] Monitoring & Logging

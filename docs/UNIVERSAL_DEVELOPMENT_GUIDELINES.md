@@ -63,14 +63,14 @@ docs(readme): update installation instructions
 #### Testing Patterns
 - **Unit Tests:** Einzelne Funktionen/Methoden (TDD)
 - **Integration Tests:** Zusammenspiel zwischen Komponenten
-- **End-to-End Tests:** Kritische User-Workflows
+- **End-to-End Tests:** Full-Stack Workflows (Backend + Frontend)
 - **Coverage Minimum:** 80-90% für Business Logic
 
 ## 🎨 Universelle Code-Struktur Standards
 
 ### Projekt-Organisation
 
-#### Moderne Backend/Frontend-Trennung
+#### Moderne Backend/Frontend-Trennung mit Full-Stack E2E
 ```
 project-root/
 ├── backend/                # Backend Services
@@ -101,11 +101,17 @@ project-root/
 │   │   └── types/         # TypeScript Type Definitions
 │   ├── tests/             # Frontend Tests
 │   │   ├── unit/          # Component Unit Tests
-│   │   ├── integration/   # Component Integration Tests
-│   │   └── e2e/           # End-to-End Tests
+│   │   └── integration/   # Component Integration Tests
 │   └── public/            # Static Assets
+├── tests/                 # Full-Stack Testing
+│   └── e2e/               # End-to-End Tests (Backend + Frontend)
+│       ├── pages/         # Page Object Models
+│       ├── fixtures/      # Test Data & Setup
+│       ├── tests/         # Test Scenarios
+│       └── utils/         # Test Utilities
 ├── docs/                  # Project Documentation
 ├── config/                # Shared Configuration
+├── playwright.config.ts   # E2E Test Configuration
 └── scripts/               # Shared Scripts
 ```
 

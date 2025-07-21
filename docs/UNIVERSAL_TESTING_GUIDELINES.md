@@ -1004,6 +1004,866 @@ public class UserServiceTests
 }
 ```
 
+## 🎭 End-to-End Testing mit Playwright
+
+### 📚 Playwright E2E Testing Standards
+
+**Projektstruktur-Referenz:** Siehe [UNIVERSAL_DEVELOPMENT_GUIDELINES.md](./UNIVERSAL_DEVELOPMENT_GUIDELINES.md) für die vollständige Projektorganisation.
+
+#### Full-Stack E2E-Verzeichnisstruktur (Root-Level für Backend + Frontend Tests)
+```
+tests/e2e/                 # Full-Stack E2E Tests Root
+├── pages/                 # Page Object Models
+│   ├── base-page.ts      # Base Page Class
+│   ├── login-page.ts     # Login Page Object
+│   ├── dashboard-page.ts # Dashboard Page Object
+│   └── api-health-page.ts# API Testing Page Object
+├── fixtures/              # Test Data & Setup
+│   ├── auth.json         # Authentication State
+│   ├── users.json        # User Test Data
+│   └── test-data.ts      # Data Factories
+├── tests/                 # Test Scenarios
+│   ├── auth/             # Authentication Tests
+│   ├── workflows/        # Business Workflow Tests
+│   └── api/              # API E2E Tests (Backend)
+├── utils/                 # Test Utilities
+│   ├── auth-helper.ts    # Authentication Helpers
+│   └── data-helper.ts    # Data Manipulation
+└── config/                # Playwright Configuration
+    └── environments.ts    # Environment-specific configs
+playwright.config.ts       # Main Playwright Configuration (Root-Level)
+```
+
+**Rationale für Root-Level E2E:**
+- **Full-Stack Testing:** Tests validieren Backend + Frontend zusammen
+- **Einheitliche Konfiguration:** Ein Playwright-Setup für alle E2E-Tests
+- **Realitätsnahe Tests:** E2E sollte das komplette System testen
+- **Weniger Duplikation:** Ein Setup statt getrennte Backend/Frontend E2E
+
+### 🚀 Playwright Setup & Configuration
+
+#### Installation & Setup
+```bash
+# Installation
+npm init playwright@latest
+
+# Konfiguration für mehrere Browser
+npx playwright install
+```
+
+#### Playwright Konfiguration (playwright.config.ts)
+```typescript
+import { defineConfig, devices } from '@playwright/test';
+
+export default defineConfig({
+  // Test-Verzeichnis
+  testDir: './tests/e2e',
+  
+  // Parallel Testing
+  fullyParallel: true,
+  
+  // Retry-Strategie
+  retries: process.env.CI ? 2 : 0,
+  
+  // Workers für parallele Ausführung
+  workers: process.env.CI ? 1 : undefined,
+  
+  // Reporter
+  reporter: [
+    ['html'],
+    ['json', { outputFile: 'test-results.json' }],
+    ['junit', { outputFile: 'test-results.xml' }]
+  ],
+  
+  // Global Setup
+  use: {
+    // Base URL
+    baseURL: process.env.BASE_URL || 'http://localhost:3000',
+    
+    // Screenshots bei Fehlern
+    screenshot: 'only-on-failure',
+    
+    // Video bei Fehlern
+    video: 'retain-on-failure',
+    
+    // Trace bei Fehlern
+    trace: 'on-first-retry',
+    
+    // Navigation Timeout
+    navigationTimeout: 30000,
+    
+    // Action Timeout
+    actionTimeout: 10000
+  },
+  
+  // Browser-Konfiguration
+  projects: [
+    {
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'] },
+    },
+    {
+      name: 'firefox',
+      use: { ...devices['Desktop Firefox'] },
+    },
+    {
+      name: 'webkit',
+      use: { ...devices['Desktop Safari'] },
+    },
+    // Mobile Testing
+    {
+      name: 'Mobile Chrome',
+      use: { ...devices['Pixel 5'] },
+    },
+    {
+      name: 'Mobile Safari',
+      use: { ...devices['iPhone 12'] },
+    },
+  ],
+  
+  // Dev Server (optional)
+  webServer: {
+    command: 'npm run dev',
+    url: 'http://localhost:3000',
+    reuseExistingServer: !process.env.CI,
+  },
+});
+```
+
+### 🏗️ Page Object Model Pattern
+
+#### Base Page Class
+```typescript
+// pages/base-page.ts
+import { Page, Locator } from '@playwright/test';
+
+export abstract class BasePage {
+  readonly page: Page;
+  
+  constructor(page: Page) {
+    this.page = page;
+  }
+  
+  // Common navigation methods
+  async goto(path: string): Promise<void> {
+    await this.page.goto(path);
+  }
+  
+  async waitForPageLoad(): Promise<void> {
+    await this.page.waitForLoadState('domcontentloaded');
+  }
+  
+  // Common interaction methods
+  async clickElement(selector: string): Promise<void> {
+    await this.page.click(selector);
+  }
+  
+  async fillInput(selector: string, text: string): Promise<void> {
+    await this.page.fill(selector, text);
+  }
+  
+  async getText(selector: string): Promise<string> {
+    return await this.page.textContent(selector) || '';
+  }
+  
+  // Wait helpers
+  async waitForElement(selector: string): Promise<Locator> {
+    return this.page.waitForSelector(selector);
+  }
+  
+  async waitForUrl(urlPattern: string | RegExp): Promise<void> {
+    await this.page.waitForURL(urlPattern);
+  }
+  
+  // Screenshot helper
+  async takeScreenshot(name: string): Promise<void> {
+    await this.page.screenshot({ 
+      path: `test-results/screenshots/${name}.png`,
+      fullPage: true 
+    });
+  }
+}
+```
+
+#### Specific Page Objects
+```typescript
+// pages/login-page.ts
+import { expect, Page } from '@playwright/test';
+import { BasePage } from './base-page';
+
+export class LoginPage extends BasePage {
+  // Locators
+  readonly emailInput = this.page.locator('[data-testid="email-input"]');
+  readonly passwordInput = this.page.locator('[data-testid="password-input"]');
+  readonly loginButton = this.page.locator('[data-testid="login-button"]');
+  readonly errorMessage = this.page.locator('[data-testid="error-message"]');
+  readonly forgotPasswordLink = this.page.locator('[data-testid="forgot-password"]');
+  
+  constructor(page: Page) {
+    super(page);
+  }
+  
+  // Navigation
+  async navigate(): Promise<void> {
+    await this.goto('/login');
+    await this.waitForPageLoad();
+  }
+  
+  // Actions
+  async login(email: string, password: string): Promise<void> {
+    await this.emailInput.fill(email);
+    await this.passwordInput.fill(password);
+    await this.loginButton.click();
+  }
+  
+  async loginWithValidCredentials(): Promise<void> {
+    await this.login('test@example.com', 'password123');
+  }
+  
+  async clickForgotPassword(): Promise<void> {
+    await this.forgotPasswordLink.click();
+  }
+  
+  // Assertions
+  async expectLoginSuccess(): Promise<void> {
+    await expect(this.page).toHaveURL(/.*\/dashboard/);
+  }
+  
+  async expectLoginError(expectedMessage: string): Promise<void> {
+    await expect(this.errorMessage).toBeVisible();
+    await expect(this.errorMessage).toContainText(expectedMessage);
+  }
+  
+  async expectToBeOnLoginPage(): Promise<void> {
+    await expect(this.page).toHaveURL(/.*\/login/);
+    await expect(this.loginButton).toBeVisible();
+  }
+}
+```
+
+```typescript
+// pages/dashboard-page.ts
+import { expect, Page, Locator } from '@playwright/test';
+import { BasePage } from './base-page';
+
+export class DashboardPage extends BasePage {
+  // Locators
+  readonly welcomeMessage = this.page.locator('[data-testid="welcome-message"]');
+  readonly userMenu = this.page.locator('[data-testid="user-menu"]');
+  readonly logoutButton = this.page.locator('[data-testid="logout-button"]');
+  readonly statsCards = this.page.locator('[data-testid="stats-card"]');
+  readonly navigationMenu = this.page.locator('[data-testid="nav-menu"]');
+  
+  constructor(page: Page) {
+    super(page);
+  }
+  
+  // Navigation
+  async navigate(): Promise<void> {
+    await this.goto('/dashboard');
+    await this.waitForPageLoad();
+  }
+  
+  // Actions
+  async logout(): Promise<void> {
+    await this.userMenu.click();
+    await this.logoutButton.click();
+  }
+  
+  async navigateToSection(sectionName: string): Promise<void> {
+    await this.navigationMenu.locator(`text=${sectionName}`).click();
+  }
+  
+  // Getters
+  async getWelcomeMessage(): Promise<string> {
+    return await this.welcomeMessage.textContent() || '';
+  }
+  
+  async getStatsCount(): Promise<number> {
+    return await this.statsCards.count();
+  }
+  
+  // Assertions
+  async expectDashboardLoaded(): Promise<void> {
+    await expect(this.welcomeMessage).toBeVisible();
+    await expect(this.navigationMenu).toBeVisible();
+  }
+  
+  async expectUserLoggedIn(userName: string): Promise<void> {
+    await expect(this.welcomeMessage).toContainText(userName);
+  }
+}
+```
+
+### 🧪 E2E Test Examples
+
+#### Authentication Tests
+```typescript
+// tests/auth/login.spec.ts
+import { test, expect } from '@playwright/test';
+import { LoginPage } from '../../pages/login-page';
+import { DashboardPage } from '../../pages/dashboard-page';
+
+test.describe('User Authentication', () => {
+  let loginPage: LoginPage;
+  let dashboardPage: DashboardPage;
+  
+  test.beforeEach(async ({ page }) => {
+    loginPage = new LoginPage(page);
+    dashboardPage = new DashboardPage(page);
+    await loginPage.navigate();
+  });
+  
+  test('should login with valid credentials', async ({ page }) => {
+    // Arrange
+    const validEmail = 'test@example.com';
+    const validPassword = 'password123';
+    
+    // Act
+    await loginPage.login(validEmail, validPassword);
+    
+    // Assert
+    await loginPage.expectLoginSuccess();
+    await dashboardPage.expectDashboardLoaded();
+    await dashboardPage.expectUserLoggedIn('Test User');
+  });
+  
+  test('should show error with invalid credentials', async ({ page }) => {
+    // Arrange
+    const invalidEmail = 'invalid@example.com';
+    const invalidPassword = 'wrongpassword';
+    
+    // Act
+    await loginPage.login(invalidEmail, invalidPassword);
+    
+    // Assert
+    await loginPage.expectLoginError('Invalid credentials');
+    await loginPage.expectToBeOnLoginPage();
+  });
+  
+  test('should navigate to forgot password', async ({ page }) => {
+    // Act
+    await loginPage.clickForgotPassword();
+    
+    // Assert
+    await expect(page).toHaveURL(/.*\/forgot-password/);
+  });
+});
+```
+
+#### Business Workflow Tests
+```typescript
+// tests/workflows/user-registration.spec.ts
+import { test, expect } from '@playwright/test';
+import { RegistrationPage } from '../../pages/registration-page';
+import { DashboardPage } from '../../pages/dashboard-page';
+import { generateUniqueUser } from '../../fixtures/test-data';
+
+test.describe('User Registration Workflow', () => {
+  test('complete user registration flow', async ({ page }) => {
+    // Arrange
+    const registrationPage = new RegistrationPage(page);
+    const dashboardPage = new DashboardPage(page);
+    const userData = generateUniqueUser();
+    
+    // Act & Assert - Step by step workflow
+    
+    // Step 1: Navigate to registration
+    await registrationPage.navigate();
+    await registrationPage.expectToBeOnRegistrationPage();
+    
+    // Step 2: Fill registration form
+    await registrationPage.fillRegistrationForm(userData);
+    await registrationPage.submitForm();
+    
+    // Step 3: Verify email verification page
+    await expect(page).toHaveURL(/.*\/verify-email/);
+    
+    // Step 4: Simulate email verification (in real test, check email)
+    await registrationPage.verifyEmail(userData.email);
+    
+    // Step 5: Complete profile setup
+    await registrationPage.completeProfileSetup(userData.profile);
+    
+    // Step 6: Verify successful registration and dashboard access
+    await dashboardPage.expectDashboardLoaded();
+    await dashboardPage.expectUserLoggedIn(userData.firstName);
+    
+    // Step 7: Verify user data is correctly displayed
+    await registrationPage.verifyUserProfile(userData);
+  });
+});
+```
+
+### 🔧 Advanced Playwright Patterns
+
+#### API Testing mit Playwright
+```typescript
+// tests/api/user-api.spec.ts
+import { test, expect } from '@playwright/test';
+
+test.describe('User API E2E Tests', () => {
+  test('should create user via API and verify in UI', async ({ request, page }) => {
+    // Arrange
+    const userData = {
+      email: 'api-test@example.com',
+      firstName: 'API',
+      lastName: 'Test',
+      password: 'password123'
+    };
+    
+    // Act - Create user via API
+    const response = await request.post('/api/users', {
+      data: userData
+    });
+    
+    // Assert API response
+    expect(response.status()).toBe(201);
+    const createdUser = await response.json();
+    expect(createdUser.email).toBe(userData.email);
+    
+    // Act - Verify user in UI
+    await page.goto('/admin/users');
+    const userRow = page.locator(`[data-testid="user-${createdUser.id}"]`);
+    
+    // Assert UI shows user
+    await expect(userRow).toBeVisible();
+    await expect(userRow.locator('.email')).toContainText(userData.email);
+  });
+  
+  test('should handle API errors gracefully in UI', async ({ request, page }) => {
+    // Arrange - Create user with duplicate email
+    const duplicateUserData = {
+      email: 'existing@example.com', // Already exists
+      firstName: 'Duplicate',
+      lastName: 'User'
+    };
+    
+    // Act - Try to register via UI
+    await page.goto('/register');
+    await page.fill('[data-testid="email"]', duplicateUserData.email);
+    await page.fill('[data-testid="firstName"]', duplicateUserData.firstName);
+    await page.fill('[data-testid="lastName"]', duplicateUserData.lastName);
+    await page.click('[data-testid="submit-button"]');
+    
+    // Assert - UI shows appropriate error
+    const errorMessage = page.locator('[data-testid="error-message"]');
+    await expect(errorMessage).toBeVisible();
+    await expect(errorMessage).toContainText('Email already exists');
+  });
+});
+```
+
+#### Visual Testing
+```typescript
+// tests/visual/homepage.spec.ts
+import { test, expect } from '@playwright/test';
+
+test.describe('Visual Regression Tests', () => {
+  test('homepage should match visual baseline', async ({ page }) => {
+    // Navigate to homepage
+    await page.goto('/');
+    
+    // Wait for page to fully load
+    await page.waitForLoadState('networkidle');
+    
+    // Hide dynamic elements (timestamps, etc.)
+    await page.addStyleTag({
+      content: `
+        .timestamp, .dynamic-content {
+          visibility: hidden !important;
+        }
+      `
+    });
+    
+    // Take screenshot and compare
+    await expect(page).toHaveScreenshot('homepage.png');
+  });
+  
+  test('mobile homepage should match baseline', async ({ page }) => {
+    // Set mobile viewport
+    await page.setViewportSize({ width: 375, height: 667 });
+    
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
+    
+    // Mobile-specific screenshot
+    await expect(page).toHaveScreenshot('homepage-mobile.png');
+  });
+});
+```
+
+#### Performance Testing
+```typescript
+// tests/performance/page-performance.spec.ts
+import { test, expect } from '@playwright/test';
+
+test.describe('Performance Tests', () => {
+  test('homepage should load within performance budget', async ({ page }) => {
+    // Start performance monitoring
+    await page.goto('/', { waitUntil: 'networkidle' });
+    
+    // Get performance metrics
+    const performanceMetrics = await page.evaluate(() => {
+      const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+      return {
+        domContentLoaded: navigation.domContentLoadedEventEnd - navigation.domContentLoadedEventStart,
+        firstPaint: performance.getEntriesByName('first-paint')[0]?.startTime,
+        firstContentfulPaint: performance.getEntriesByName('first-contentful-paint')[0]?.startTime,
+        loadComplete: navigation.loadEventEnd - navigation.loadEventStart
+      };
+    });
+    
+    // Assert performance budgets
+    expect(performanceMetrics.domContentLoaded).toBeLessThan(1000); // < 1s
+    expect(performanceMetrics.firstContentfulPaint).toBeLessThan(1500); // < 1.5s
+    expect(performanceMetrics.loadComplete).toBeLessThan(3000); // < 3s
+  });
+});
+```
+
+### 🔄 Test Data Management
+
+#### Test Data Factory
+```typescript
+// fixtures/test-data.ts
+import { faker } from '@faker-js/faker';
+
+export interface UserData {
+  email: string;
+  firstName: string;
+  lastName: string;
+  password: string;
+  profile: {
+    bio: string;
+    company: string;
+    location: string;
+  };
+}
+
+export function generateUniqueUser(): UserData {
+  return {
+    email: faker.internet.email(),
+    firstName: faker.person.firstName(),
+    lastName: faker.person.lastName(),
+    password: 'Test123!@#',
+    profile: {
+      bio: faker.lorem.paragraph(),
+      company: faker.company.name(),
+      location: faker.location.city()
+    }
+  };
+}
+
+export function generateValidUser(overrides: Partial<UserData> = {}): UserData {
+  const defaultUser = {
+    email: 'test@example.com',
+    firstName: 'John',
+    lastName: 'Doe',
+    password: 'Test123!@#',
+    profile: {
+      bio: 'Test user bio',
+      company: 'Test Company',
+      location: 'Test City'
+    }
+  };
+  
+  return { ...defaultUser, ...overrides };
+}
+
+// Test Data für verschiedene Szenarien
+export const testUsers = {
+  admin: generateValidUser({
+    email: 'admin@example.com',
+    firstName: 'Admin',
+    lastName: 'User'
+  }),
+  
+  standardUser: generateValidUser({
+    email: 'user@example.com',
+    firstName: 'Standard',
+    lastName: 'User'
+  }),
+  
+  premiumUser: generateValidUser({
+    email: 'premium@example.com',
+    firstName: 'Premium',
+    lastName: 'User'
+  })
+};
+```
+
+#### Database State Management
+```typescript
+// fixtures/database-helper.ts
+import { test as base } from '@playwright/test';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
+export const test = base.extend({
+  // Database cleanup fixture
+  cleanDatabase: async ({}, use) => {
+    // Cleanup before test
+    await prisma.user.deleteMany();
+    await prisma.order.deleteMany();
+    
+    await use();
+    
+    // Cleanup after test
+    await prisma.user.deleteMany();
+    await prisma.order.deleteMany();
+  },
+  
+  // Pre-seeded data fixture
+  seededData: async ({}, use) => {
+    // Create test data
+    const user = await prisma.user.create({
+      data: {
+        email: 'test@example.com',
+        firstName: 'Test',
+        lastName: 'User'
+      }
+    });
+    
+    await use({ user });
+    
+    // Cleanup
+    await prisma.user.delete({ where: { id: user.id } });
+  }
+});
+```
+
+### 🐛 Debugging & Troubleshooting
+
+#### Debug-Modi
+```typescript
+// Debug-spezifische Test-Konfiguration
+test.describe.configure({ mode: 'serial' }); // Tests sequenziell ausführen
+
+test('debug specific scenario', async ({ page }) => {
+  // Slow down actions for debugging
+  test.slow();
+  
+  // Enable debugging
+  await page.pause(); // Pausiert für manuelle Inspektion
+  
+  // Step-by-step debugging
+  await page.goto('/');
+  console.log('Navigated to homepage');
+  
+  await page.click('[data-testid="button"]');
+  console.log('Clicked button');
+  
+  // Screenshot bei jedem Schritt
+  await page.screenshot({ path: 'debug-step-1.png' });
+});
+```
+
+#### Error Handling
+```typescript
+// Robuste Error-Behandlung
+test('resilient test with retries', async ({ page }) => {
+  // Retry-Logik für flaky elements
+  await test.step('Navigate and wait for element', async () => {
+    await page.goto('/');
+    
+    // Warte auf kritisches Element mit Retry
+    const criticalElement = page.locator('[data-testid="critical-element"]');
+    await expect(criticalElement).toBeVisible({ timeout: 10000 });
+  });
+  
+  // Graceful handling von langsamen Operationen
+  await test.step('Perform slow operation', async () => {
+    await page.click('[data-testid="slow-action"]');
+    
+    // Erwarte Loading-State
+    await expect(page.locator('[data-testid="loading"]')).toBeVisible();
+    
+    // Warte auf Completion
+    await expect(page.locator('[data-testid="loading"]')).toBeHidden({ timeout: 30000 });
+    await expect(page.locator('[data-testid="result"]')).toBeVisible();
+  });
+});
+```
+
+### 🚀 CI/CD Integration
+
+#### GitHub Actions Konfiguration
+```yaml
+# .github/workflows/e2e-tests.yml
+name: E2E Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  e2e-tests:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        browser: [chromium, firefox, webkit]
+        
+    steps:
+    - uses: actions/checkout@v3
+    
+    - uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Install Playwright browsers
+      run: npx playwright install --with-deps ${{ matrix.browser }}
+    
+    - name: Start application
+      run: |
+        npm run build
+        npm run start &
+        npx wait-on http://localhost:3000
+    
+    - name: Run E2E tests
+      run: npx playwright test --project=${{ matrix.browser }}
+      env:
+        CI: true
+        BASE_URL: http://localhost:3000
+    
+    - name: Upload test results
+      if: failure()
+      uses: actions/upload-artifact@v3
+      with:
+        name: playwright-report-${{ matrix.browser }}
+        path: playwright-report/
+```
+
+### 📊 E2E Testing Best Practices
+
+#### 1. Test-Isolation & Independence
+```typescript
+// ✅ Jeder Test ist unabhängig
+test.describe('Independent Tests', () => {
+  test.beforeEach(async ({ page }) => {
+    // Fresh state für jeden Test
+    await page.goto('/');
+    await page.evaluate(() => localStorage.clear());
+    await page.evaluate(() => sessionStorage.clear());
+  });
+  
+  test('test A should not affect test B', async ({ page }) => {
+    // Test A logic
+  });
+  
+  test('test B runs independently', async ({ page }) => {
+    // Test B logic - unabhängig von Test A
+  });
+});
+```
+
+#### 2. Stabile Selektoren
+```typescript
+// ✅ Verwende data-testid für stabile Selektoren
+await page.click('[data-testid="submit-button"]');
+
+// ❌ Vermeide fragile Selektoren
+await page.click('button.btn.btn-primary'); // Kann sich ändern
+await page.click('text=Submit'); // Language-dependent
+```
+
+#### 3. Page Object Model Benefits
+```typescript
+// ✅ Page Objects abstrahieren UI-Details
+const loginPage = new LoginPage(page);
+await loginPage.loginWithValidCredentials();
+await loginPage.expectLoginSuccess();
+
+// ❌ Direkte UI-Manipulation in Tests
+await page.fill('#email', 'test@example.com');
+await page.fill('#password', 'password');
+await page.click('#login-button');
+```
+
+#### 4. Assertions-Strategy
+```typescript
+// ✅ Klare, erwartete Zustände testen
+await expect(page.locator('[data-testid="success-message"]')).toBeVisible();
+await expect(page).toHaveURL(/.*\/dashboard/);
+await expect(page.locator('[data-testid="user-name"]')).toContainText('John Doe');
+
+// ✅ Negative Assertions für Error-Cases
+await expect(page.locator('[data-testid="error-message"]')).toBeVisible();
+await expect(page.locator('[data-testid="loading"]')).toBeHidden();
+```
+
+### 🎯 EVE Profit Calculator Specific E2E Scenarios
+
+#### EVE SSO Authentication Flow
+```typescript
+// tests/eve-auth/sso-flow.spec.ts
+test('EVE SSO authentication workflow', async ({ page }) => {
+  // Navigate to login
+  await page.goto('/login');
+  
+  // Click EVE SSO login
+  await page.click('[data-testid="eve-sso-login"]');
+  
+  // Should redirect to EVE SSO
+  await expect(page).toHaveURL(/.*login\.eveonline\.com.*/);
+  
+  // Fill EVE credentials (test environment)
+  await page.fill('[name="UserName"]', process.env.EVE_TEST_USERNAME!);
+  await page.fill('[name="Password"]', process.env.EVE_TEST_PASSWORD!);
+  await page.click('[type="submit"]');
+  
+  // Grant permissions
+  await page.click('[value="Authorize"]');
+  
+  // Should redirect back to app
+  await expect(page).toHaveURL(/.*localhost.*\/dashboard/);
+  
+  // Verify character data is loaded
+  await expect(page.locator('[data-testid="character-name"]')).toBeVisible();
+});
+```
+
+#### Market Data E2E Tests
+```typescript
+// tests/market/profit-calculation.spec.ts
+test('profit calculation with real market data', async ({ page }) => {
+  // Login first
+  await loginAsTestCharacter(page);
+  
+  // Navigate to profit calculator
+  await page.goto('/profit-calculator');
+  
+  // Search for item
+  await page.fill('[data-testid="item-search"]', 'Tritanium');
+  await page.click('[data-testid="search-button"]');
+  
+  // Select item from results
+  await page.click('[data-testid="item-34"]'); // Tritanium type_id
+  
+  // Verify market data is loaded
+  await expect(page.locator('[data-testid="buy-price"]')).toBeVisible();
+  await expect(page.locator('[data-testid="sell-price"]')).toBeVisible();
+  
+  // Set quantity
+  await page.fill('[data-testid="quantity-input"]', '1000000');
+  
+  // Calculate profit
+  await page.click('[data-testid="calculate-button"]');
+  
+  // Verify results
+  await expect(page.locator('[data-testid="profit-result"]')).toBeVisible();
+  await expect(page.locator('[data-testid="margin-percentage"]')).toBeVisible();
+});
+```
+
 ---
 
 ## 🎯 **TDD ist universell anwendbar**

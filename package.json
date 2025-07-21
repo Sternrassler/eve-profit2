@@ -1,0 +1,27 @@
+{
+  "name": "eve-profit2",
+  "version": "1.0.0",
+  "description": "A comprehensive backend service for analyzing profit opportunities in EVE Online using market data and character information.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sternrassler/eve-profit2.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Sternrassler/eve-profit2/issues"
+  },
+  "homepage": "https://github.com/Sternrassler/eve-profit2#readme",
+  "devDependencies": {
+    "@faker-js/faker": "^9.9.0",
+    "@playwright/test": "^1.54.1",
+    "@types/node": "^24.0.15"
+  }
+}

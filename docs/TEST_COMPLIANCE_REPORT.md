@@ -44,6 +44,17 @@ backend/tests/
 │   └── api_test.go              ✅ Integration testing
 └── fixtures/
     └── test_data.go             ✅ Shared test data
+
+tests/e2e/                       ✅ Full-Stack E2E Testing
+├── pages/
+│   ├── base-page.ts            ✅ Page Object Model base
+│   ├── api-health-page.ts      ✅ API testing page objects
+│   └── items-api-page.ts       ✅ EVE-specific API testing
+├── fixtures/
+│   └── test-data.ts            ✅ EVE test data factory
+└── tests/
+    └── api/
+        └── health.spec.ts      ✅ Backend API E2E tests
 ```
 
 ## Test Coverage Analysis
@@ -66,13 +77,22 @@ backend/tests/
 - **API Integration**: ✅ Working
 - **ESI Integration**: ✅ Working
 
+### End-to-End Tests
+- **Total Tests**: 6 E2E test functions
+- **All Tests Passing**: ✅ 100% pass rate
+- **Full-Stack Testing**: ✅ Backend + Frontend integration
+- **API Health Checks**: ✅ Working
+- **EVE API Connectivity**: ✅ Working
+- **Database Connection**: ✅ Working
+
 ## Guidelines Compliance Checklist
 
 ### ✅ Test Organization (Universal Development Guidelines)
 - [x] Tests separated from source code
-- [x] Clear directory structure: `/tests/unit/`, `/tests/integration/`
-- [x] Test files follow `*_test.go` naming convention
-- [x] Package naming follows `package_test` pattern
+- [x] Backend tests: `/backend/tests/unit/`, `/backend/tests/integration/`
+- [x] Full-Stack E2E tests: `/tests/e2e/` (Root-level)
+- [x] Test files follow `*_test.go` and `*.spec.ts` naming conventions
+- [x] Package naming follows `package_test` pattern (Go)
 
 ### ✅ Test Quality (Universal Testing Guidelines)
 - [x] Arrange-Act-Assert pattern consistently used
@@ -80,6 +100,8 @@ backend/tests/
 - [x] Comprehensive error handling tests
 - [x] Mock objects where appropriate
 - [x] Integration tests for database operations
+- [x] Page Object Model for E2E tests
+- [x] Full-Stack E2E validation (Backend + Frontend)
 
 ### ✅ Clean Code Principles (Universal Clean Code Guidelines)
 - [x] DRY principle: Shared test fixtures
@@ -103,16 +125,19 @@ backend/tests/
 
 ### Test Execution
 ```bash
-# Unit tests only
+# Backend Unit tests only
 make test-unit
 
-# Integration tests (requires SDE database)
+# Backend Integration tests (requires SDE database)
 make test-integration
 
-# Full coverage report
+# Full-Stack E2E tests (Playwright)
+npx playwright test
+
+# Backend coverage report
 make coverage
 
-# Pre-commit checks
+# Pre-commit checks (Backend + E2E)
 make pre-commit
 ```
 
