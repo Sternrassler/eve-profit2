@@ -1,0 +1,239 @@
+/* EVE Profit Calculator 2.0 - Main Styles */
+/* Based on Universal Development Guidelines - Clean CSS Architecture */
+
+:root {
+  /* EVE Online Color Scheme */
+  --eve-primary: #00a8cc;
+  --eve-secondary: #004d5c;
+  --eve-accent: #ffd700;
+  --eve-success: #00cc44;
+  --eve-error: #cc4400;
+  --eve-background: #0a0a0a;
+  --eve-surface: #1a1a1a;
+  --eve-text: #ffffff;
+  --eve-text-secondary: #cccccc;
+  
+  /* Spacing */
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 1rem;
+  --spacing-md: 1.5rem;
+  --spacing-lg: 2rem;
+  --spacing-xl: 3rem;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--eve-background);
+  color: var(--eve-text);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header Styles */
+.app-header {
+  background: linear-gradient(135deg, var(--eve-primary), var(--eve-secondary));
+  padding: var(--spacing-lg);
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 168, 204, 0.3);
+}
+
+.app-header h1 {
+  font-size: 2.5rem;
+  margin-bottom: var(--spacing-xs);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.app-header p {
+  font-size: 1.2rem;
+  color: var(--eve-text-secondary);
+}
+
+/* Main Content */
+.app-main {
+  flex: 1;
+  padding: var(--spacing-lg);
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Status Section */
+.status-section,
+.search-section {
+  background-color: var(--eve-surface);
+  border-radius: 8px;
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  border: 1px solid var(--eve-secondary);
+}
+
+.status-section h2,
+.search-section h2 {
+  color: var(--eve-accent);
+  margin-bottom: var(--spacing-sm);
+  font-size: 1.5rem;
+}
+
+.success-message {
+  background-color: rgba(0, 204, 68, 0.1);
+  border: 1px solid var(--eve-success);
+  border-radius: 4px;
+  padding: var(--spacing-sm);
+  color: var(--eve-success);
+}
+
+.error-message {
+  background-color: rgba(204, 68, 0, 0.1);
+  border: 1px solid var(--eve-error);
+  border-radius: 4px;
+  padding: var(--spacing-sm);
+  color: var(--eve-error);
+}
+
+.error-message button {
+  margin-top: var(--spacing-xs);
+  background-color: var(--eve-error);
+  color: white;
+  border: none;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.error-message button:hover {
+  background-color: #aa3300;
+}
+
+.success-message ul {
+  list-style: none;
+  margin-top: var(--spacing-xs);
+}
+
+.success-message li {
+  margin-bottom: 0.25rem;
+}
+
+/* Selected Item Display */
+.selected-item {
+  background-color: var(--eve-background);
+  border: 1px solid var(--eve-primary);
+  border-radius: 6px;
+  padding: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+}
+
+.selected-item h3 {
+  color: var(--eve-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.item-details p {
+  color: var(--eve-text-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.item-details strong {
+  color: var(--eve-text);
+}
+
+/* Features Section */
+.features-section {
+  background-color: var(--eve-surface);
+  border-radius: 8px;
+  padding: var(--spacing-md);
+  border: 1px solid var(--eve-secondary);
+}
+
+.features-section h2 {
+  color: var(--eve-accent);
+  margin-bottom: var(--spacing-md);
+  font-size: 1.5rem;
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.feature-card {
+  background-color: var(--eve-background);
+  border: 1px solid var(--eve-primary);
+  border-radius: 8px;
+  padding: var(--spacing-md);
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 168, 204, 0.2);
+}
+
+.feature-card h3 {
+  color: var(--eve-primary);
+  margin-bottom: var(--spacing-xs);
+  font-size: 1.3rem;
+}
+
+.feature-card p {
+  color: var(--eve-text-secondary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.feature-card button {
+  background-color: var(--eve-primary);
+  color: white;
+  border: none;
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.feature-card button:hover:not(:disabled) {
+  background-color: var(--eve-secondary);
+}
+
+.feature-card button:disabled {
+  background-color: #666;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Footer */
+.app-footer {
+  background-color: var(--eve-surface);
+  padding: var(--spacing-md);
+  text-align: center;
+  border-top: 1px solid var(--eve-secondary);
+  color: var(--eve-text-secondary);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .app-header h1 {
+    font-size: 2rem;
+  }
+  
+  .app-main {
+    padding: var(--spacing-sm);
+  }
+  
+  .feature-grid {
+    grid-template-columns: 1fr;
+  }
+}

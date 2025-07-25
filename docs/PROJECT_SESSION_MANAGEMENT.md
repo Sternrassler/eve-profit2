@@ -26,12 +26,47 @@ und Character API Handlers mit TDD."
 
 ## 🛠️ EVE Development Commands
 
-### Server starten & testen
+### 🚀 Automatische Server-Verwaltung (EMPFOHLEN)
 ```bash
+# EINFACH: Entwicklungsumgebung komplett starten
+./dev-server.sh start         # Startet Backend + Frontend automatisch
+
+# Weitere Commands
+./dev-server.sh status        # Server Status prüfen
+./dev-server.sh stop          # Alle Server stoppen
+./dev-server.sh restart       # Alle Server neu starten
+./dev-server.sh logs          # Logs beider Server anzeigen
+./dev-server.sh test          # Backend Tests ausführen
+./dev-server.sh help          # Alle Commands anzeigen
+
+# Alternative: Makefile (für Make-User)
+make start                    # = ./dev-server.sh start
+make status                   # = ./dev-server.sh status
+make stop                     # = ./dev-server.sh stop
+```
+
+### Server URLs (nach ./dev-server.sh start)
+- **Backend:** http://localhost:9000 (mit automatischem Health Check ✅)  
+- **Frontend:** http://localhost:3001 (React mit Hot Reload)
+- **Health Check:** http://localhost:9000/api/v1/health
+
+### VS Code Integration
+```
+Ctrl+Shift+P → "Tasks: Run Task" → "EVE: Start Development Servers"
+```
+
+### 🔧 Manuelle Server-Verwaltung (Legacy)
+```bash
+# Backend (falls manuell nötig)
 cd backend
 go run cmd/server/main.go     # Server auf Port 9000
-go test ./...                 # Alle Tests (18/18 ✅)
+go test ./...                 # Alle Tests (31/32 ✅)
 curl http://localhost:9000/api/v1/esi/test  # ESI Test
+
+# Frontend (falls manuell nötig)  
+cd frontend
+npm install                   # Dependencies installieren
+npx vite --port 3001         # Development Server starten
 ```
 
 ### Git Status & Commit

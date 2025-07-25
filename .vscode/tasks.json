@@ -1,0 +1,147 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "EVE: Start Development Servers",
+      "type": "shell",
+      "command": "./dev-server.sh",
+      "args": ["start"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "panel": "new",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Start both backend and frontend servers automatically"
+    },
+    {
+      "label": "EVE: Stop All Servers",
+      "type": "shell", 
+      "command": "./dev-server.sh",
+      "args": ["stop"],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "panel": "shared",
+        "showReuseMessage": false
+      },
+      "problemMatcher": [],
+      "detail": "Stop all running development servers"
+    },
+    {
+      "label": "EVE: Server Status",
+      "type": "shell",
+      "command": "./dev-server.sh", 
+      "args": ["status"],
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "panel": "shared",
+        "showReuseMessage": false
+      },
+      "problemMatcher": [],
+      "detail": "Show current server status"
+    },
+    {
+      "label": "EVE: Start Backend Only",
+      "type": "shell",
+      "command": "./dev-server.sh",
+      "args": ["backend"],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "panel": "shared",
+        "showReuseMessage": false
+      },
+      "problemMatcher": [],
+      "detail": "Start only the Go backend server"
+    },
+    {
+      "label": "EVE: Start Frontend Only", 
+      "type": "shell",
+      "command": "./dev-server.sh",
+      "args": ["frontend"],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "panel": "shared",
+        "showReuseMessage": false
+      },
+      "problemMatcher": [],
+      "detail": "Start only the React frontend server"
+    },
+    {
+      "label": "EVE: Show Logs",
+      "type": "shell",
+      "command": "./dev-server.sh",
+      "args": ["logs"],
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "panel": "shared",
+        "showReuseMessage": false
+      },
+      "problemMatcher": [],
+      "detail": "Show logs from both servers"
+    },
+    {
+      "label": "EVE: Run Backend Tests",
+      "type": "shell",
+      "command": "./dev-server.sh",
+      "args": ["test"],
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "panel": "shared",
+        "showReuseMessage": false
+      },
+      "problemMatcher": [],
+      "detail": "Run Go backend tests"
+    },
+    {
+      "label": "EVE: Run E2E Tests",
+      "type": "shell",
+      "command": "npx",
+      "args": ["playwright", "test"],
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "panel": "new",
+        "showReuseMessage": false
+      },
+      "problemMatcher": [],
+      "detail": "Run Playwright E2E tests"
+    },
+    {
+      "label": "EVE: Clean Development Environment",
+      "type": "shell",
+      "command": "make",
+      "args": ["clean"],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "panel": "shared",
+        "showReuseMessage": false
+      },
+      "problemMatcher": [],
+      "detail": "Clean up logs and stop all servers"
+    }
+  ]
+}

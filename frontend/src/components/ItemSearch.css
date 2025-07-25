@@ -1,0 +1,133 @@
+/* ItemSearch Component Styles */
+/* Based on Universal Development Guidelines - Clean CSS Architecture */
+
+.item-search {
+  margin-bottom: var(--spacing-lg);
+}
+
+.search-input-group {
+  display: flex;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-sm);
+}
+
+.search-input {
+  flex: 1;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background-color: var(--eve-background);
+  border: 1px solid var(--eve-secondary);
+  border-radius: 4px;
+  color: var(--eve-text);
+  font-size: 1rem;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--eve-primary);
+  box-shadow: 0 0 0 2px rgba(0, 168, 204, 0.2);
+}
+
+.search-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.search-button {
+  padding: var(--spacing-xs) var(--spacing-md);
+  background-color: var(--eve-primary);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  min-width: 120px;
+  transition: background-color 0.3s ease;
+}
+
+.search-button:hover:not(:disabled) {
+  background-color: var(--eve-secondary);
+}
+
+.search-button:disabled {
+  background-color: #666;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.search-error {
+  background-color: rgba(204, 68, 0, 0.1);
+  border: 1px solid var(--eve-error);
+  border-radius: 4px;
+  padding: var(--spacing-sm);
+  color: var(--eve-error);
+  margin-bottom: var(--spacing-sm);
+}
+
+.search-results {
+  margin-top: var(--spacing-md);
+}
+
+.search-results h3 {
+  color: var(--eve-accent);
+  margin-bottom: var(--spacing-sm);
+}
+
+.items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--spacing-sm);
+}
+
+.item-card {
+  background-color: var(--eve-background);
+  border: 1px solid var(--eve-secondary);
+  border-radius: 6px;
+  padding: var(--spacing-sm);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: left;
+  width: 100%;
+  font-family: inherit;
+  color: inherit;
+}
+
+.item-card:hover {
+  border-color: var(--eve-primary);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 168, 204, 0.2);
+}
+
+.item-card h4 {
+  color: var(--eve-primary);
+  margin-bottom: var(--spacing-xs);
+  font-size: 1.1rem;
+}
+
+.item-card p {
+  color: var(--eve-text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+}
+
+.published {
+  color: var(--eve-success);
+  font-size: 0.85rem;
+  font-weight: bold;
+}
+
+.unpublished {
+  color: var(--eve-error);
+  font-size: 0.85rem;
+  font-weight: bold;
+}
+
+/* Responsive Design for Item Search */
+@media (max-width: 768px) {
+  .search-input-group {
+    flex-direction: column;
+  }
+  
+  .items-grid {
+    grid-template-columns: 1fr;
+  }
+}
