@@ -1,6 +1,6 @@
 # EVE Profit Calculator 2.0 - Entwicklungsstatus
 
-> **Letzte Aktualisierung:** 21. Juli 2025  
+> **Letzte Aktualisierung:** 25. Juli 2025  
 > **Aktuelle Phase:** Phase 5 E2E Testing ✅ ABGESCHLOSSEN  
 > **Entwickler:** Karsten Flache  
 > **Entwicklungsmethodik:** Clean Code + Test-Driven Development (TDD) + SonarQube Integration + Full-Stack E2E
@@ -21,8 +21,7 @@
 **Vollständige Standards siehe:**
 - `UNIVERSAL_CLEAN_CODE_GUIDELINES.md` - Clean Code + SOLID Prinzipien
 - `UNIVERSAL_TESTING_GUIDELINES.md` - TDD Red-Green-Refactor Workflows + E2E Testing
-- `UNIVERSAL_DEVELOPMENT_GUIDELINES.md` - Projektmanagement + Full-Stack E2E Architecture  
-- `TEST_COMPLIANCE_REPORT.md` - Aktuelle Test-Coverage + E2E Status
+- `UNIVERSAL_DEVELOPMENT_GUIDELINES.md` - Projektmanagement + Full-Stack E2E Architecture
 
 ---
 
@@ -150,6 +149,8 @@ backend/
 - **Items Handler:** 8/8 Tests + Real SDE Integration
 - **SonarQube Compliance:** 0 Bugs, 0 Vulnerabilities, 0 Code Smells
 
+**💡 Vollständige API-Dokumentation und Test Coverage siehe: `PROJECT_API_SPECS.md`**
+
 ### Test Commands
 ```bash
 # Backend Tests
@@ -249,13 +250,13 @@ npx playwright show-report             # Test results report
 
 ### Verfügbare Docs
 - `PROJECT_CONTEXT.md` - Vollständige Projektdefinition
+- `PROJECT_API_SPECS.md` - Komplette API Dokumentation & Test Coverage
 - `ESI_INTEGRATION.md` - ESI Setup Guide
 - `DEVELOPMENT_GUIDELINES.md` - Entwicklungsstandards
-- `GO_BACKEND_SPECS.md` - Backend-Architektur
-- `CHARACTER_API_SPECS.md` - EVE SSO Integration
-- `ENDPOINT_COVERAGE_REPORT.md` - Vollständige API-Test Abdeckung
-- `TEST_COMPLIANCE_REPORT.md` - Test-Status und Coverage
+- `PROJECT_SESSION_MANAGEMENT.md` - Operative Commands
 - `.env.example` - Konfiguration Template
+
+**💡 Alle API-Spezifikationen und Test Coverage jetzt zentral in PROJECT_API_SPECS.md!**
 
 ---
 

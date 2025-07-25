@@ -24,26 +24,9 @@ go mod tidy
 go run cmd/server/main.go
 ```
 
-Server läuft auf http://localhost:8080
+Server läuft auf http://localhost:9000
 
-## 🛠️ API Endpoints
-
-### Health Check
-```bash
-curl http://localhost:8080/health
-```
-
-### API v1 (Stubs)
-```bash
-# Market Data
-curl http://localhost:8080/api/v1/market/prices/34
-
-# Items Search  
-curl http://localhost:8080/api/v1/items/search?q=tritanium
-
-# Profit Calculation
-curl -X POST http://localhost:8080/api/v1/profit/calculate
-```
+**� Vollständige API-Dokumentation siehe: `docs/PROJECT_API_SPECS.md`**
 
 ## 📊 SDE Database
 

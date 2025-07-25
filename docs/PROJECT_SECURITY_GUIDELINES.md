@@ -16,46 +16,11 @@ cp backend/.env.example backend/.env
 nano backend/.env
 ```
 
-### 2. Echte EVE Application Credentials einfügen
-```bash
-# In backend/.env (NICHT IN GIT!)
-ESI_CLIENT_ID=your_actual_eve_client_id_here
-ESI_CLIENT_SECRET=your_actual_eve_client_secret_here
-ESI_CALLBACK_URL=http://localhost:9000/callback
-ESI_BASE_URL=https://esi.evetech.net
-```
-
-### 3. EVE Developer Application Settings
-**Für neue Entwickler: EVE Application anlegen**
-
-1. Gehe zu: https://developers.eveonline.com/applications
-2. Erstelle neue Application:
-   - **Name:** EVE Profit Calculator 2.0
-   - **Description:** Trading optimization tool
-   - **Callback URL:** `http://localhost:9000/callback`
-   - **Scopes:** Siehe .env.example für vollständige Liste
-
-3. Verwende die generierten Credentials in deiner lokalen .env
+**💡 Vollständige API Security Configuration siehe: `PROJECT_API_SPECS.md`**
 
 ## 🏭 Production Deployment
 
-### Environment Variables (Empfohlen)
-```bash
-# Docker
-docker run -e ESI_CLIENT_ID=xxx -e ESI_CLIENT_SECRET=xxx app
-
-# Kubernetes
-kubectl create secret generic eve-esi-config \
-  --from-literal=ESI_CLIENT_ID=xxx \
-  --from-literal=ESI_CLIENT_SECRET=xxx
-
-# Heroku
-heroku config:set ESI_CLIENT_ID=xxx ESI_CLIENT_SECRET=xxx
-
-# Azure App Service
-az webapp config appsettings set --name myapp --resource-group mygroup \
-  --settings ESI_CLIENT_ID=xxx ESI_CLIENT_SECRET=xxx
-```
+**💡 Vollständige Production Deployment Commands siehe: `PROJECT_API_SPECS.md`**
 
 ### Azure Key Vault (Enterprise)
 ```go

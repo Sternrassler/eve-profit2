@@ -20,7 +20,7 @@ Erstelle React + TypeScript Frontend mit Backend API Integration."
 
 ### Character API implementieren
 ```
-"Lies CHARACTER_API_SPECS.md. Implementiere EVE SSO OAuth Flow 
+"Lies PROJECT_API_SPECS.md. Implementiere EVE SSO OAuth Flow 
 und Character API Handlers mit TDD."
 ```
 
@@ -113,20 +113,7 @@ go mod tidy                   # Go Modules cleanup
 go build ./cmd/server         # EVE Server Binary erstellen
 ```
 
-### EVE-spezifische API Tests
-```bash
-# Market Data Test (Jita - Tritanium)
-curl "http://localhost:9000/api/v1/market/orders/30000142/34"
-
-# Item Search Test  
-curl "http://localhost:9000/api/v1/items/search?name=tritanium"
-
-# SDE Database Test
-curl "http://localhost:9000/api/v1/sde/items/34"
-
-# EVE SSO Configuration Test
-curl "http://localhost:9000/api/v1/auth/login"
-```
+**💡 API Testing Commands siehe: `PROJECT_API_SPECS.md`**
 
 
 ## � Development Commands
