@@ -16,8 +16,13 @@ COPY go.mod go.sum ./
 # Download dependencies
 RUN go mod download
 
-# Copy source code
-COPY . .
+# Copy source code (excluding large data files)
+COPY cmd/ cmd/
+COPY internal/ internal/
+COPY pkg/ pkg/
+
+# Copy data directory separately to avoid cache issues
+COPY data/ data/
 
 # Build the application
 RUN CGO_ENABLED=1 GOOS=linux go build -a -installsuffix cgo -o main cmd/server/main.go
