@@ -7,6 +7,25 @@ import axios from 'axios';
 const API_BASE_URL = 'http://localhost:9000';
 const API_VERSION = 'v1';
 
+// Custom Error Class for API errors
+export class ApiError extends Error {
+  public readonly status: number;
+  public readonly message: string;
+  public readonly type: 'SERVER_ERROR' | 'NETWORK_ERROR' | 'REQUEST_ERROR';
+
+  constructor(
+    status: number,
+    message: string,
+    type: 'SERVER_ERROR' | 'NETWORK_ERROR' | 'REQUEST_ERROR'
+  ) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+    this.message = message;
+    this.type = type;
+  }
+}
+
 // API Client Instance with Clean Code principles
 export class ApiClient {
   private readonly client = axios.create({
@@ -45,32 +64,38 @@ export class ApiClient {
   }
 
   // Clean Code: Single Responsibility - Error handling
-  private handleApiError(error: any): ApiError {
-    if (error.response) {
+  private handleApiError(error: unknown): ApiError {
+    const axiosError = error as { 
+      response?: { status: number; data?: string }; 
+      message?: string; 
+      request?: unknown 
+    };
+    
+    if (axiosError.response) {
       // Server responded with error status
       return new ApiError(
-        error.response.status,
-        error.response.data as string || error.message,
+        axiosError.response.status,
+        axiosError.response.data as string || axiosError.message || 'Unknown error',
         'SERVER_ERROR'
       );
-    } else if (error.request) {
-      // Network error
+    } else if (axiosError.request) {
+      // Request was made but no response received
       return new ApiError(
         0,
-        'Network error - Backend server not reachable',
+        'No response from server',
         'NETWORK_ERROR'
       );
     } else {
-      // Request setup error
+      // Something else happened
       return new ApiError(
         0,
-        error.message,
+        axiosError.message || 'Request setup error',
         'REQUEST_ERROR'
       );
     }
   }
 
-  // Public API method
+  // Public API methods
   public async get<T>(endpoint: string): Promise<T> {
     const response = await this.client.get<T>(endpoint);
     return response.data;
@@ -82,24 +107,5 @@ export class ApiClient {
   }
 }
 
-// Custom Error Class for API errors
-export class ApiError extends Error {
-  public readonly status: number;
-  public readonly message: string;
-  public readonly type: 'SERVER_ERROR' | 'NETWORK_ERROR' | 'REQUEST_ERROR';
-
-  constructor(
-    status: number,
-    message: string,
-    type: 'SERVER_ERROR' | 'NETWORK_ERROR' | 'REQUEST_ERROR'
-  ) {
-    super(message);
-    this.name = 'ApiError';
-    this.status = status;
-    this.message = message;
-    this.type = type;
-  }
-}
-
-// Singleton instance following Clean Code principles
+// Singleton instance
 export const apiClient = new ApiClient();
