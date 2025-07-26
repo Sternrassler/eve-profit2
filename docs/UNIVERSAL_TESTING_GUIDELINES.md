@@ -1,53 +1,21 @@
-# Universal Testing Guidelines
+# Universal Testing Guidelines - EVE Profit Calculator 2.0
 
-## 🎯 Universelle Test-Driven Development (TDD) Guidelines
+> **Hinweis:** Primäre TDD Rules sind in `.github/copilot-instructions.md` definiert.  
+> Diese Datei enthält erweiterte Testing-Patterns und detaillierte Implementierungsrichtlinien.
 
-Diese Testing-Richtlinien können für jedes Softwareprojekt und jede Programmiersprache verwendet werden.
+## 🎯 Erweiterte Test-Driven Development (TDD) Guidelines
 
-## 📖 TDD Fundamentals
+Diese erweiterte Referenz ergänzt die Basis TDD-Regeln aus `.github/copilot-instructions.md`.
 
-### Test-First Entwicklung - Der TDD-Zyklus
+## 📖 TDD Fundamentals - Extended
 
-```
-🔴 RED (Test schreiben):
-   1. Schreibe einen fehlschlagenden Test
-   2. Test definiert das erwartete Verhalten
-   3. Kompiliere-Fehler = failing test
+> **Basis TDD-Workflow:** Siehe `.github/copilot-instructions.md`  
+> **RED:** Test schreiben (fails)  
+> **GREEN:** Minimal code (passes)  
+> **REFACTOR:** Clean up  
+> **Arrange-Act-Assert** Pattern immer  
 
-🟢 GREEN (Minimal-Code):
-   1. Schreibe minimalen Code für Test-Pass
-   2. Keine "schöne" Lösung, nur funktional
-   3. Test muss grün werden
-
-🔄 REFACTOR (Verbesserung):
-   1. Code-Qualität verbessern
-   2. Clean Code Prinzipien anwenden
-   3. Tests MÜSSEN grün bleiben!
-```
-
-## 🧪 Universelle Test-Patterns
-
-### 1. Arrange-Act-Assert (AAA) Pattern
-
-**Das AAA-Pattern funktioniert in allen Programmiersprachen:**
-
-```python
-# Python Example
-def test_calculate_discount_should_return_20_percent_of_price():
-    # Arrange
-    price = 100.0
-    discount_rate = 0.20
-    expected_discount = 20.0
-    calculator = DiscountCalculator()
-    
-    # Act
-    actual_discount = calculator.calculate_discount(price, discount_rate)
-    
-    # Assert
-    assert actual_discount == expected_discount
-```
-
-```typescript
+### EVE-spezifische TDD-Patterns
 // TypeScript Example
 describe('DiscountCalculator', () => {
     test('should return 20% discount of price', () => {

@@ -1,51 +1,49 @@
-# Universal Clean Code Reference
+# Universal Clean Code Reference - EVE Profit Calculator 2.0
+
+> **Hinweis:** Primäre Coding Rules sind in `.github/copilot-instructions.md` definiert.  
+> Diese Datei enthält erweiterte Clean Code Prinzipien und detaillierte Implementierungsrichtlinien.
 
 ## 📚 Clean Code Prinzipien (Robert C. Martin)
 
-Diese universelle Referenz kann für jedes Softwareprojekt verwendet werden. Die Beispiele sind in Go und TypeScript, aber die Prinzipien gelten für alle Programmiersprachen.
+Diese erweiterte Referenz ergänzt die Basis-Regeln aus `.github/copilot-instructions.md` mit detaillierten Implementierungsrichtlinien für Go und TypeScript.
 
-## 🎯 Kernprinzipien
+## 🎯 Erweiterte Clean Code Prinzipien
 
-### 1. Meaningful Names (Aussagekräftige Namen)
+> **Basis-Regeln:** Siehe `.github/copilot-instructions.md`  
+> **Meaningful Names:** `calculateNetProfit()` statt `calc()`  
+> **Single Responsibility:** Eine Funktion = eine Aufgabe  
+> **Dependency Injection:** Interfaces für Testbarkeit  
+
+### 1. Advanced Function Design
+
+### 1. Advanced Function Design
+
+**EVE-spezifische Implementierung:**
 
 ```go
-// ❌ Schlecht: Abkürzungen und unklare Namen
-func calc(p1, p2 float64, q int) float64 {
-    return (p2 - p1) * float64(q)
-}
-
-// ✅ Gut: Selbsterklärende Namen
-func CalculateNetProfitFromTransaction(buyPrice, sellPrice float64, quantity int) float64 {
-    profitPerUnit := sellPrice - buyPrice
-    return profitPerUnit * float64(quantity)
-}
-```
-
-```typescript
-// ❌ Schlecht: Cryptisch und unklar
-const proc = (d: number[], t: number) => {
-    let s = 0;
-    return s;
-}
-
-// ✅ Gut: Selbstdokumentierend
-const calculateTotalRevenueWithTax = (
-    revenues: number[], 
-    taxRate: number
-): number => {
-    const totalRevenue = revenues.reduce((sum, revenue) => sum + revenue, 0);
-    const taxAmount = totalRevenue * taxRate;
-    return totalRevenue - taxAmount;
+// ✅ EVE Domain-spezifische Namen mit Business Logic
+func CalculateTradingProfitWithCharacterSkills(
+    buyPrice, sellPrice float64, 
+    quantity int, 
+    characterSkills models.CharacterSkills,
+) (*models.TradingProfit, error) {
+    if buyPrice <= 0 || sellPrice <= 0 {
+        return nil, errors.New("invalid prices")
+    }
+    
+    baseProfitPerUnit := sellPrice - buyPrice
+    skillMultiplier := characterSkills.GetTradingMultiplier()
+    adjustedProfit := baseProfitPerUnit * skillMultiplier
+    
+    return &models.TradingProfit{
+        NetProfit: adjustedProfit * float64(quantity),
+        Margin:    (adjustedProfit / buyPrice) * 100,
+        Volume:    quantity,
+    }, nil
 }
 ```
 
-**Regeln:**
-- Verwende aussagekräftige und aussprechbare Namen
-- Verwende suchbare Namen für wichtige Konzepte
-- Vermeide mentale Zuordnung und Codierung
-- Ein Konzept pro Wort
-
-### 2. Functions (Funktionen)
+**Erweiterte Regeln:**
 
 ```go
 // ❌ Schlecht: Zu viele Verantwortlichkeiten

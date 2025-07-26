@@ -1,51 +1,21 @@
-# Universal Development Guidelines
+# Universal Development Guidelines - EVE Profit Calculator 2.0
+
+> **Hinweis:** Primäre Development Rules sind in `.github/copilot-instructions.md` definiert.  
+> Diese Datei enthält erweiterte Projektmanagement-Standards und Entwicklungsprozesse.
 
 ## 🎯 Für neue Sessions - Sofort lesen!
 
-Diese universellen Entwicklungsrichtlinien können für jedes Softwareprojekt verwendet werden und müssen bei jeder neuen Entwicklungssession beachtet werden.
+**Obligatorische Lesereihenfolge:**
+1. **`.github/copilot-instructions.md`** - Primäre Coding Rules (TDD + Clean Code + EVE Domain)
+2. **`docs/PROJECT_STATUS.md`** - Aktueller Entwicklungsstand  
+3. Diese Datei - Erweiterte Entwicklungsprozesse
 
-## 📖 Obligatorische Session-Vorbereitung
-**Vor jeder Entwicklungsarbeit:**
-1. Projektdokumentation lesen (README, STATUS, etc.)
-2. Diese Development Guidelines lesen
-3. Testing Guidelines verstehen
-4. Aktuellen Code-Stand überprüfen
+## � Session-Vorbereitung (Extended)
 
-## 🔧 Universelle Technische Standards
+> **Basis:** Alle 135 Tests müssen bestehen (31 Backend + 19 Frontend + 85 E2E)  
+> **Quality Gates:** TypeScript: 0 errors, ESLint: 0 warnings, SonarQube: 0 issues  
 
-## 📚 Grundlagen - Obligatorische Referenzen
-
-**Vor jeder Entwicklungsarbeit müssen diese beiden Dokumente gelesen werden:**
-
-### 🎯 Clean Code Prinzipien
-**Siehe: `UNIVERSAL_CLEAN_CODE_GUIDELINES.md`**
-
-Diese umfassende Referenz enthält alle Clean Code Prinzipien:
-- Meaningful Names & Selbstdokumentierender Code
-- Single Responsibility Functions
-- SOLID Prinzipien (SRP, OCP, LSP, ISP, DIP)
-- Code-Struktur und Formatting Standards
-- Universelle Patterns und Best Practices
-
-### 🧪 Test-Driven Development (TDD)
-**Siehe: `UNIVERSAL_TESTING_GUIDELINES.md`**
-
-Diese umfassende TDD-Referenz enthält:
-- Red-Green-Refactor Zyklus
-- AAA Pattern (Arrange-Act-Assert)
-- Test-Organisation und Naming Conventions
-- Mocking Best Practices
-- Framework-spezifische Beispiele (Python, TypeScript, Go, Java, C#)
-
-## 💼 Projektmanagement Standards
-
-### Universelle Konfigurationsstandards
-
-#### Code-Qualität Tools
-- **Linter:** ESLint (JS/TS), golangci-lint (Go), pylint (Python)
-- **Static Analysis:** SonarQube (kontinuierliche Qualitätsüberwachung)
-- **Formatter:** Prettier (JS/TS), gofmt (Go), black (Python)
-- **Type Checking:** TypeScript strict mode, mypy (Python)
+### Erweiterte Qualitätsprüfung:
 
 #### Git Best Practices
 ```bash

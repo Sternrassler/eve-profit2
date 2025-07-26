@@ -6,27 +6,29 @@ A comprehensive backend service for analyzing profit opportunities in EVE Online
 
 ## 📖 Documentation
 
+**🎯 Primary Rules:** [`.github/copilot-instructions.md`](.github/copilot-instructions.md) - **GitHub Copilot automatically applies these coding standards**
+
 All project documentation is located in the [`docs/`](./docs/) directory:
 
 ### 📋 Project Documentation
+- **[Project Status](./docs/PROJECT_STATUS.md)** - **Current Phase 7 status and all development progress**
 - **[Project Context](./docs/PROJECT_CONTEXT.md)** - Project overview and objectives
-- **[Project Status](./docs/PROJECT_STATUS.md)** - Current development status and progress
 - **[Project Session Management](./docs/PROJECT_SESSION_MANAGEMENT.md)** - Development session guidelines
 
-### 🔧 API & Technical Specifications  
-- **[Character API Specs](./docs/CHARACTER_API_SPECS.md)** - Character API specifications and endpoints
-- **[Project Security Guidelines](./docs/PROJECT_SECURITY_GUIDELINES.md)** - 🔒 **Security configuration for EVE ESI credentials**
-
-### 🎯 Universal Development Guidelines (Must Read!)
-- **[Development Guidelines](./docs/UNIVERSAL_DEVELOPMENT_GUIDELINES.md)** - Universal development standards and project structure
-- **[Clean Code Guidelines](./docs/UNIVERSAL_CLEAN_CODE_GUIDELINES.md)** - Clean Code and SOLID principles
-- **[Testing Guidelines](./docs/UNIVERSAL_TESTING_GUIDELINES.md)** - TDD and testing best practices
-- **[Session Management Guidelines](./docs/UNIVERSAL_SESSION_MANAGEMENT_GUIDELINES.md)** - Universal session management
+### 🎯 Extended Development Guidelines
+- **[Development Guidelines](./docs/UNIVERSAL_DEVELOPMENT_GUIDELINES.md)** - Extended development standards  
+- **[Clean Code Guidelines](./docs/UNIVERSAL_CLEAN_CODE_GUIDELINES.md)** - Extended Clean Code principles
+- **[Testing Guidelines](./docs/UNIVERSAL_TESTING_GUIDELINES.md)** - Extended TDD patterns
 
 ### 📚 Additional Documentation
 Check the [`docs/`](./docs/) directory for any additional project documentation.
 
 ## ⚠️ Before Starting Development
+
+**🎯 Quick Start - Essential Reading Order:**
+1. **[`.github/copilot-instructions.md`](.github/copilot-instructions.md)** - Primary coding rules (GitHub Copilot auto-applies)
+2. **[`docs/PROJECT_STATUS.md`](./docs/PROJECT_STATUS.md)** - Current Phase 7 development status
+3. **Run tests:** `go test ./... && npm test && npx playwright test` (All 135 tests must pass)
 
 **Required Reading:**
 1. **[Project Status](./docs/PROJECT_STATUS.md)** - Current development phase and priorities
