@@ -90,5 +90,92 @@ test('should render input', () => {
 - ESLint: 0 warnings
 - SonarQube: 0 issues
 
+## 🔧 **CI/CD Pipeline Rules (VERBINDLICH)**
+
+### 📋 **Pflichtprüfungen vor jedem Commit**
+
+#### 1. **CI/CD Pipeline Status prüfen**
+```bash
+# IMMER ausführen vor Code-Änderungen
+gh run list --limit 3
+gh run view <run-id> --log  # bei Fehlern
+```
+
+**Regel:** Jede Code-Änderung muss erst nach erfolgreicher Pipeline-Prüfung committed werden.
+
+#### 2. **Frontend Linting (Obligatorisch)**
+```bash
+cd frontend
+npm run lint          # ESLint Prüfung
+npm run type-check     # TypeScript Validation
+```
+
+**Regel:** Alle ESLint-Fehler müssen VOR dem Commit behoben werden. Keine Ausnahmen.
+
+#### 3. **Backend Testing (Obligatorisch)**
+```bash
+cd backend
+go test -v ./...      # Go Tests
+go vet ./...          # Go Static Analysis
+```
+
+**Regel:** Alle Tests müssen grün sein. Failing Tests blockieren den Commit.
+
+### 🚀 **CI/CD Pipeline Monitoring**
+
+#### **Pipeline Status Check Workflow:**
+1. **Nach jedem Push:** `gh run list` ausführen
+2. **Bei Fehlern:** Detaillierte Logs mit `gh run view <id> --log` prüfen
+3. **Reparatur:** Fehler beheben BEVOR weitere Entwicklung
+4. **Validierung:** Pipeline muss grün sein vor dem nächsten Feature
+
+#### **Häufige Pipeline-Fehler beheben:**
+- **ESLint Errors:** TypeScript `any` durch konkrete Typen ersetzen  
+- **Empty Interfaces:** Leere Interfaces entfernen oder erweitern
+- **Deprecated Actions:** GitHub Actions auf neueste Versionen aktualisieren
+- **YAML Syntax:** GitHub Actions Workflow-Dateien validieren
+
+### 📊 **Automatisierte Quality Gates**
+
+Das Projekt verwendet folgende automatisierte Prüfungen:
+
+1. **Backend Tests (Go):** 31 Tests müssen bestehen
+2. **Frontend Tests (React):** 36 Tests müssen bestehen  
+3. **E2E Tests (Playwright):** 85 Tests müssen bestehen
+4. **Security Scanning:** Trivy Vulnerability Scanner
+5. **Docker Build:** Multi-stage Builds für Backend + Frontend
+6. **Code Coverage:** Codecov Integration für Metriken
+
+**Ziel:** 152/153 Tests bestehen (99.3% Success Rate)
+
+### ⚡ **Schnelle Problemlösung**
+
+#### **Bei ESLint Fehlern:**
+```typescript
+// ❌ Falsch
+private handleError(error: any): void
+
+// ✅ Richtig  
+private handleError(error: unknown): void {
+  const typedError = error as { message?: string };
+  // ...
+}
+```
+
+#### **Bei Pipeline Fehlern:**
+1. **Logs prüfen:** `gh run view <id> --log`
+2. **Lokale Tests:** `npm run lint && npm run type-check`
+3. **Reparatur committen:** Nur Fehler-Fixes, keine neuen Features
+4. **Pipeline erneut prüfen:** Bestätigung des Erfolgs
+
+### 🚨 **Wichtige Erinnerungen**
+
+- **NIEMALS** Pipeline-Fehler ignorieren
+- **IMMER** ESLint-Errors vor Commit beheben  
+- **IMMER** TypeScript-Errors vor Commit beheben
+- **NIEMALS** `any` in TypeScript verwenden
+- **IMMER** CI/CD Status nach Push überprüfen
+- **SOFORT** Reparaturen bei roten Pipelines
+
 ---
 **TDD + Clean Code + EVE Domain Knowledge + 100% Test Coverage**
