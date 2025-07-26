@@ -1,4 +1,4 @@
-// TDD Tests für ItemSearch Komponente - Angepasst an aktuelle Implementierung
+// TDD Tests für ItemSearch Komponente - Fixed Mock Integration
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -20,13 +20,8 @@ vi.mock('../../services', () => ({
   }
 }));
 
-const mockItemsService = {
-  searchItems: vi.fn(),
-  getItemDetails: vi.fn(),
-} as typeof itemsService & {
-  searchItems: ReturnType<typeof vi.fn>;
-  getItemDetails: ReturnType<typeof vi.fn>;
-};
+// Get the mocked service properly typed
+const mockItemsService = vi.mocked(itemsService);
 
 // Test constants
 const TEST_CONSTANTS = {
