@@ -125,6 +125,14 @@ jobs:
       with:
         go-version: '1.21'
 
+    - name: Download SDE database for E2E tests
+      run: |
+        mkdir -p backend/data
+        if [ ! -f backend/data/sqlite-latest.sqlite ]; then
+          curl -L -o backend/data/sqlite-latest.sqlite.bz2 https://www.fuzzwork.co.uk/dump/sqlite-latest.sqlite.bz2
+          bzip2 -d backend/data/sqlite-latest.sqlite.bz2
+        fi
+
     - name: Install Playwright browsers
       run: npx playwright install --with-deps
 
@@ -140,6 +148,7 @@ jobs:
     - name: Start frontend server
       run: |
         cd frontend
+        npm ci
         npm run build
         npm run preview &
         sleep 5
