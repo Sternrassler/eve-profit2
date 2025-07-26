@@ -45,11 +45,12 @@ jobs:
 
     - name: Download SDE database for tests
       run: |
-        mkdir -p backend/data
-        if [ ! -f backend/data/sqlite-latest.sqlite ]; then
-          curl -L -o backend/data/sqlite-latest.sqlite.bz2 https://www.fuzzwork.co.uk/dump/sqlite-latest.sqlite.bz2
-          bzip2 -d backend/data/sqlite-latest.sqlite.bz2
+        mkdir -p data
+        if [ ! -f data/sqlite-latest.sqlite ]; then
+          curl -L -o data/sqlite-latest.sqlite.bz2 https://www.fuzzwork.co.uk/dump/sqlite-latest.sqlite.bz2
+          bzip2 -d data/sqlite-latest.sqlite.bz2
         fi
+      working-directory: backend
 
     - name: Run backend tests
       working-directory: ./backend
