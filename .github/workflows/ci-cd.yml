@@ -35,7 +35,7 @@ jobs:
       uses: actions/cache@v3
       with:
         path: ~/go/pkg/mod
-        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        key: ${{ runner.os }}-go-${{ hashFiles('backend/go.sum') }}
         restore-keys: |
           ${{ runner.os }}-go-
 
@@ -81,7 +81,7 @@ jobs:
       run: npm run lint
 
     - name: Run frontend tests
-      run: npm test -- --run --coverage
+      run: npm run test:run
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
