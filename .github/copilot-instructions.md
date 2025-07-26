@@ -31,6 +31,53 @@ EVE Online Trading Calculator mit Go-Backend + React-Frontend, Clean Code + TDD.
 - **Mock Dependencies** - ESI API, Database, Services
 - **All Tests Pass** - 135/135 müssen grün sein
 
+## 🛡️ **ZERO-TOLERANCE Test Policy (VERBINDLICH)**
+
+### **🚨 Absolute Regel: NO FEATURE DEVELOPMENT ohne 100% grüne Tests**
+
+**VOR jeder Feature-Erweiterung oder Code-Änderung:**
+
+1. **ALLE lokalen Tests müssen bestehen:**
+   ```bash
+   # Backend Tests (Go)
+   cd backend && go test -v ./...
+   
+   # Frontend Tests (React) 
+   cd frontend && npm run test:run
+   
+   # E2E Tests (lokal)
+   npx playwright test
+   ```
+
+2. **VOLLSTÄNDIGE CI/CD-Pipeline muss grün sein:**
+   ```bash
+   gh run list --limit 1    # Letzte Pipeline prüfen
+   gh run view <id> --log   # Bei Fehlern detailliert analysieren
+   ```
+
+3. **Quality Gates müssen erfüllt sein:**
+   - ✅ Backend Tests: 31+ Tests bestehen
+   - ✅ Frontend Tests: 36+ Tests bestehen  
+   - ✅ E2E Tests: 85+ Tests bestehen
+   - ✅ ESLint: 0 Errors
+   - ✅ TypeScript: 0 Errors
+   - ✅ Security Scan: Pass
+
+### **🚫 ENTWICKLUNGS-STOPP bei roten Tests**
+
+- **KEINE neuen Features** bis alle Tests grün
+- **KEINE Code-Commits** mit failing Tests
+- **KEINE Pipeline-Ignorierung** - Fehler SOFORT beheben
+- **IMMER Fix-First** - repariere kaputte Tests vor neuer Arbeit
+
+### **⚡ Schneller Test-Status-Check**
+```bash
+# All-in-One Test Status Check
+./scripts/check-all-tests.sh   # falls vorhanden
+# oder manuell:
+cd backend && go test ./... && cd ../frontend && npm run test:run && cd .. && gh run list --limit 1
+```
+
 > **Development Setup:** Siehe `docs/PROJECT_SESSION_MANAGEMENT.md` für Commands und Server-Management
 
 ## 💻 Code Patterns
@@ -76,6 +123,8 @@ test('should render input', () => {
 - Breaking existing tests  
 - Hardcoded values
 - Unhandled errors
+- **Feature-Development bei roten Tests** ⚠️
+- **Pipeline-Ignorierung bei Fehlern** ⚠️
 
 ## 📚 Dokumentations-Regeln
 - **Projekt-Status-Änderungen** IMMER in `docs/PROJECT_STATUS.md` dokumentieren
@@ -89,6 +138,7 @@ test('should render input', () => {
 - TypeScript: 0 errors
 - ESLint: 0 warnings
 - SonarQube: 0 issues
+- **CI/CD Pipeline: 100% grün** 🎯
 
 ## 🔧 **CI/CD Pipeline Rules (VERBINDLICH)**
 
