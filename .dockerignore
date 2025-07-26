@@ -1,0 +1,59 @@
+# EVE Profit Calculator 2.0 - Docker ignore patterns
+# Exclude unnecessary files from Docker build context
+
+# Git
+.git
+.gitignore
+.github
+
+# Documentation
+README.md
+docs/
+*.md
+
+# Development files
+.vscode/
+.env*
+.air.toml
+Makefile*
+dev-server.*
+
+# Build artifacts
+tmp/
+dist/
+build/
+target/
+bin/
+coverage/
+*.log
+
+# Dependencies (will be installed in container)
+node_modules/
+vendor/
+
+# Test files and reports
+test-results/
+playwright-report/
+coverage/
+*.test.js
+*_test.go
+
+# OS specific
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# IDE
+.idea/
+*.iml
+.vscode/settings.json
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Package manager locks (keep only one)
+# yarn.lock  # if using npm
+# package-lock.json  # if using yarn

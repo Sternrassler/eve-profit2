@@ -1,0 +1,137 @@
+# EVE Profit Calculator 2.0 - Production Docker Compose
+# Full-stack deployment with optimized containers
+
+version: '3.8'
+
+services:
+  # Backend Service (Go + Gin)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: eve-profit-backend
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+    environment:
+      - GO_ENV=production
+      - SERVER_PORT=9000
+      - SDE_DB_PATH=/app/data/sqlite-latest.sqlite
+      - CACHE_TTL=300
+      - ESI_BASE_URL=https://esi.evetech.net
+      - ESI_RATE_LIMIT=150
+    volumes:
+      - backend_data:/app/data
+      - backend_logs:/app/logs
+    networks:
+      - eve-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    depends_on:
+      - backend-cache
+
+  # Frontend Service (React + Nginx)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: eve-profit-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - REACT_APP_API_BASE_URL=http://localhost:9000
+    volumes:
+      - frontend_logs:/var/log/nginx
+    networks:
+      - eve-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health/frontend"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    depends_on:
+      - backend
+
+  # Redis Cache for Backend
+  backend-cache:
+    image: redis:7-alpine
+    container_name: eve-profit-cache
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - cache_data:/data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+    networks:
+      - eve-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    command: redis-server /usr/local/etc/redis/redis.conf
+
+  # Monitoring - Prometheus (Optional)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: eve-profit-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    networks:
+      - eve-network
+    profiles:
+      - monitoring
+
+  # Monitoring - Grafana (Optional)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: eve-profit-grafana
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana:/etc/grafana/provisioning
+    networks:
+      - eve-network
+    profiles:
+      - monitoring
+    depends_on:
+      - prometheus
+
+# Volumes for persistent data
+volumes:
+  backend_data:
+    driver: local
+  backend_logs:
+    driver: local
+  frontend_logs:
+    driver: local
+  cache_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+
+# Network for service communication
+networks:
+  eve-network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/16

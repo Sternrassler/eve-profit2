@@ -1,0 +1,12 @@
+# Backend specific ignores
+node_modules/
+frontend/
+tests/
+docs/
+.github/
+*.md
+.env*
+.air.toml
+tmp/
+coverage/
+*.log

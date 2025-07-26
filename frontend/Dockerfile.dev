@@ -1,0 +1,22 @@
+# EVE Profit Calculator 2.0 - Frontend Development Container
+# Hot reloading for rapid React development
+
+FROM node:20-alpine
+
+# Set working directory
+WORKDIR /app
+
+# Install dependencies for development
+RUN apk add --no-cache git
+
+# Copy package files
+COPY package*.json ./
+
+# Install all dependencies (including dev)
+RUN npm ci
+
+# Expose port
+EXPOSE 3000
+
+# Run with hot reloading
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]

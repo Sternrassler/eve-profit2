@@ -1,0 +1,125 @@
+# EVE Profit Calculator 2.0 - Production & Development Makefile
+# Simplified Docker orchestration and development workflows
+
+.PHONY: help build up down logs test clean dev prod backup restore
+
+# Default target
+help: ## Show this help message
+	@echo "EVE Profit Calculator 2.0 - Docker Commands"
+	@echo "============================================="
+	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-15s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+
+# Production commands
+build: ## Build all production containers
+	@echo "🏗️  Building production containers..."
+	docker-compose build --no-cache
+
+up: ## Start production environment
+	@echo "🚀 Starting production environment..."
+	docker-compose up -d
+	@echo "✅ Production environment started!"
+	@echo "📈 Frontend: http://localhost:3000"
+	@echo "🔧 Backend: http://localhost:9000"
+
+down: ## Stop production environment
+	@echo "🛑 Stopping production environment..."
+	docker-compose down
+
+logs: ## Show production logs
+	docker-compose logs -f
+
+# Development commands
+dev-build: ## Build development containers
+	@echo "🏗️  Building development containers..."
+	docker-compose -f docker-compose.dev.yml build --no-cache
+
+dev-up: ## Start development environment with hot reloading
+	@echo "🚀 Starting development environment..."
+	docker-compose -f docker-compose.dev.yml up -d
+	@echo "✅ Development environment started!"
+	@echo "📈 Frontend: http://localhost:3000 (Hot Reload)"
+	@echo "🔧 Backend: http://localhost:9000 (Hot Reload)"
+
+dev-down: ## Stop development environment
+	@echo "🛑 Stopping development environment..."
+	docker-compose -f docker-compose.dev.yml down
+
+dev-logs: ## Show development logs
+	docker-compose -f docker-compose.dev.yml logs -f
+
+# Testing commands
+test: ## Run all tests in containers
+	@echo "🧪 Running all tests..."
+	@echo "Backend Tests:"
+	docker-compose exec backend go test ./...
+	@echo "Frontend Tests:"
+	docker-compose exec frontend npm test -- --run
+	@echo "E2E Tests:"
+	npx playwright test
+
+test-backend: ## Run backend tests only
+	docker-compose exec backend go test ./...
+
+test-frontend: ## Run frontend tests only
+	docker-compose exec frontend npm test -- --run
+
+test-e2e: ## Run E2E tests
+	npx playwright test
+
+# Monitoring commands
+monitor-up: ## Start with monitoring (Prometheus + Grafana)
+	@echo "📊 Starting production with monitoring..."
+	docker-compose --profile monitoring up -d
+	@echo "✅ Production + Monitoring started!"
+	@echo "📈 Frontend: http://localhost:3000"
+	@echo "🔧 Backend: http://localhost:9000"
+	@echo "📊 Prometheus: http://localhost:9090"
+	@echo "📈 Grafana: http://localhost:3001 (admin/admin)"
+
+# Utility commands
+clean: ## Clean all containers, images, and volumes
+	@echo "🧹 Cleaning Docker environment..."
+	docker-compose down --volumes --remove-orphans
+	docker-compose -f docker-compose.dev.yml down --volumes --remove-orphans
+	docker system prune -af --volumes
+	@echo "✅ Docker environment cleaned!"
+
+restart: down up ## Restart production environment
+
+dev-restart: dev-down dev-up ## Restart development environment
+
+backup: ## Backup persistent data
+	@echo "💾 Creating backup..."
+	mkdir -p backups
+	docker run --rm -v eve-profit2_backend_data:/data -v $(PWD)/backups:/backup alpine tar czf /backup/backend-data-$(shell date +%Y%m%d-%H%M%S).tar.gz -C /data .
+	docker run --rm -v eve-profit2_cache_data:/data -v $(PWD)/backups:/backup alpine tar czf /backup/cache-data-$(shell date +%Y%m%d-%H%M%S).tar.gz -C /data .
+	@echo "✅ Backup completed in ./backups/"
+
+restore: ## Restore from latest backup (interactive)
+	@echo "🔄 Available backups:"
+	@ls -la backups/
+	@echo "Enter backup filename to restore:"
+	@read backup; docker run --rm -v eve-profit2_backend_data:/data -v $(PWD)/backups:/backup alpine tar xzf /backup/$$backup -C /data
+
+# Health checks
+health: ## Check health of all services
+	@echo "🏥 Health check results:"
+	@echo "Backend:" 
+	@curl -f http://localhost:9000/api/v1/health || echo "❌ Backend unhealthy"
+	@echo "Frontend:"
+	@curl -f http://localhost:3000/health/frontend || echo "❌ Frontend unhealthy"
+	@echo "Cache:"
+	@docker-compose exec backend-cache redis-cli ping || echo "❌ Cache unhealthy"
+
+# Development workflow
+dev: dev-build dev-up ## Complete development setup (build + start)
+
+prod: build up ## Complete production setup (build + start)
+
+# Status information
+status: ## Show container status
+	@echo "📊 Container Status:"
+	docker-compose ps
+	@echo ""
+	@echo "📊 Development Status:"
+	docker-compose -f docker-compose.dev.yml ps

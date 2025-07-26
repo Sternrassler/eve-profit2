@@ -1,0 +1,11 @@
+# Frontend specific ignores
+backend/
+tests/
+docs/
+.github/
+*.md
+.env*
+coverage/
+dist/
+build/
+*.log
