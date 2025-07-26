@@ -2,10 +2,10 @@
 # Multi-stage build for optimized production deployment
 
 # Build Stage
-FROM golang:1.21-alpine AS builder
+FROM golang:1.23-alpine AS builder
 
 # Install build dependencies
-RUN apk add --no-cache ca-certificates git sqlite tzdata
+RUN apk add --no-cache ca-certificates gcc git musl-dev sqlite tzdata
 
 # Set working directory
 WORKDIR /app
@@ -38,7 +38,6 @@ COPY --from=builder /app/main .
 
 # Copy configuration and data files
 COPY --from=builder /app/data ./data
-COPY --from=builder /app/.env.example ./.env.example
 
 # Change ownership to non-root user
 RUN chown -R appuser:appgroup /app
