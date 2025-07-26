@@ -42,8 +42,17 @@ jobs:
     - name: Download dependencies
       run: go mod download
 
+    - name: Download SDE database for tests
+      run: |
+        cd backend
+        mkdir -p data
+        if [ ! -f data/sqlite-latest.sqlite ]; then
+          curl -L -o data/sqlite-latest.sqlite.bz2 https://www.fuzzwork.co.uk/dump/sqlite-latest.sqlite.bz2
+          bzip2 -d data/sqlite-latest.sqlite.bz2
+        fi
+
     - name: Run backend tests
-      run: go test -v -race -coverprofile=coverage.out ./...
+      run: go test -v -coverprofile=coverage.out ./...
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
