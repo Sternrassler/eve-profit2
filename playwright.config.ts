@@ -86,7 +86,7 @@ export default defineConfig({
   webServer: {
     command: 'cd backend && go run cmd/server/main.go',
     url: 'http://localhost:9000',
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: true, // Always reuse existing server in CI/CD
     timeout: 120 * 1000, // 2 minutes for Go compilation
   },
 });
