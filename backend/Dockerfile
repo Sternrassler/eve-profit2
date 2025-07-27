@@ -5,7 +5,7 @@
 FROM golang:1.23-alpine AS builder
 
 # Install build dependencies
-RUN apk add --no-cache ca-certificates gcc git musl-dev sqlite tzdata
+RUN apk add --no-cache bzip2 ca-certificates gcc git musl-dev sqlite tzdata wget
 
 # Set working directory
 WORKDIR /app
@@ -21,8 +21,11 @@ COPY cmd/ cmd/
 COPY internal/ internal/
 COPY pkg/ pkg/
 
-# Copy data directory separately to avoid cache issues
-COPY data/ data/
+# Create data directory and download SDE during build
+RUN mkdir -p data && \
+    wget -O data/sqlite-latest.sqlite \
+    "https://www.fuzzwork.co.uk/dump/sqlite-latest.sqlite.bz2" && \
+    bzip2 -d data/sqlite-latest.sqlite.bz2
 
 # Build the application
 RUN CGO_ENABLED=1 GOOS=linux go build -a -installsuffix cgo -o main cmd/server/main.go
