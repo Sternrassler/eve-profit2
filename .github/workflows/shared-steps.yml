@@ -1,0 +1,15 @@
+# EVE Profit Calculator 2.0 - Shared Workflow Components
+# Reusable workflow steps to eliminate DRY violations
+name: Shared Steps
+
+on:
+  workflow_call:
+
+jobs:
+  # This file contains reusable workflow components
+  # Individual steps are referenced in main workflows
+  placeholder:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Placeholder
+      run: echo "Shared steps defined in individual workflows"

@@ -151,10 +151,10 @@ gh run list --workflow="CI Pipeline" --limit 3
 ```
 
 **Pipelines:**
-- ✅ **Frontend Tests:** TypeScript, ESLint, React Tests (15s)
+- ✅ **Frontend Tests:** TypeScript, ESLint, React Tests (18s)
 - ✅ **Backend Tests:** Go Tests mit SDE Database (1m30s)  
 - ✅ **E2E Tests:** Playwright mit Backend+Frontend (4m)
-- ✅ **Security Scan:** Trivy Vulnerability Scanner (30s)
+- ✅ **Security Scan:** Trivy Vulnerability Scanner (25s)
 
 #### **Phase 2: Docker Build (`docker-build.yml`)**
 ```bash
@@ -163,8 +163,8 @@ gh run list --workflow="Docker Build" --limit 3
 ```
 
 **Container Builds:**
-- 🐳 **Backend Docker:** Go 1.23-alpine + CGO + SQLite
-- 🐳 **Frontend Docker:** Node.js + nginx Production Build
+- 🐳 **Backend Docker:** Go 1.23-alpine + CGO + SQLite (3m7s)
+- 🐳 **Frontend Docker:** Node.js + nginx Production Build (27s)
 - 📦 **Registry Push:** ghcr.io mit separaten Caches
 
 #### **Phase 3: Deployment (`deploy.yml`)**
@@ -174,7 +174,7 @@ gh run list --workflow="Deploy" --limit 3
 ```
 
 **Deployment Flow:**
-- 🚀 **Production Deploy:** Automated nach Docker Build Success
+- 🚀 **Production Deploy:** Automated nach Docker Build Success (20s)
 - 📢 **Notifications:** Deployment Status Reporting
 
 ### 🚀 **Modulare Pipeline-Überwachung**
@@ -222,5 +222,4 @@ private handleError(error: unknown): void {
 - **IMMER** CI/CD Status nach Push überprüfen
 - **SOFORT** Reparaturen bei roten Pipelines
 
----
-**TDD + Clean Code + EVE Domain Knowledge + 100% Test Coverage**
+> **Extended Pipeline Documentation:** Siehe `docs/CI_CD_PIPELINE_ARCHITECTURE.md` für detaillierte Architektur-Specs
