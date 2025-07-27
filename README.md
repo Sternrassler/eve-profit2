@@ -86,3 +86,4 @@ This tool analyzes market data from EVE Online, a space-based MMORPG, to help pl
 ## 📄 License
 
 This project is for educational and personal use in accordance with EVE Online's Third-Party Developer License Agreement.
+# Trigger pipeline retry
