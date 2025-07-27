@@ -140,63 +140,58 @@ test('should render input', () => {
 - SonarQube: 0 issues
 - **CI/CD Pipeline: 100% grün** 🎯
 
-## 🔧 **CI/CD Pipeline Rules (VERBINDLICH)**
+## 🔧 **Modulare CI/CD Pipeline (3-Phasen-Architektur)**
 
-### 📋 **Pflichtprüfungen vor jedem Commit**
+### 📋 **Pipeline-Phasen (Sequenziell)**
 
-#### 1. **CI/CD Pipeline Status prüfen**
+#### **Phase 1: CI Pipeline (`ci.yml`)**
 ```bash
-# IMMER ausführen vor Code-Änderungen
-gh run list --limit 3
-gh run view <run-id> --log  # bei Fehlern
+# Schnelle Feedback-Schleife für Code-Qualität
+gh run list --workflow="CI Pipeline" --limit 3
 ```
 
-**Regel:** Jede Code-Änderung muss erst nach erfolgreicher Pipeline-Prüfung committed werden.
+**Pipelines:**
+- ✅ **Frontend Tests:** TypeScript, ESLint, React Tests (15s)
+- ✅ **Backend Tests:** Go Tests mit SDE Database (1m30s)  
+- ✅ **E2E Tests:** Playwright mit Backend+Frontend (4m)
+- ✅ **Security Scan:** Trivy Vulnerability Scanner (30s)
 
-#### 2. **Frontend Linting (Obligatorisch)**
+#### **Phase 2: Docker Build (`docker-build.yml`)**
 ```bash
-cd frontend
-npm run lint          # ESLint Prüfung
-npm run type-check     # TypeScript Validation
+# Triggered automatisch nach erfolgreicher CI
+gh run list --workflow="Docker Build" --limit 3
 ```
 
-**Regel:** Alle ESLint-Fehler müssen VOR dem Commit behoben werden. Keine Ausnahmen.
+**Container Builds:**
+- 🐳 **Backend Docker:** Go 1.23-alpine + CGO + SQLite
+- 🐳 **Frontend Docker:** Node.js + nginx Production Build
+- 📦 **Registry Push:** ghcr.io mit separaten Caches
 
-#### 3. **Backend Testing (Obligatorisch)**
+#### **Phase 3: Deployment (`deploy.yml`)**
 ```bash
-cd backend
-go test -v ./...      # Go Tests
-go vet ./...          # Go Static Analysis
+# Production Deployment (main branch only)
+gh run list --workflow="Deploy" --limit 3
 ```
 
-**Regel:** Alle Tests müssen grün sein. Failing Tests blockieren den Commit.
+**Deployment Flow:**
+- 🚀 **Production Deploy:** Automated nach Docker Build Success
+- 📢 **Notifications:** Deployment Status Reporting
 
-### 🚀 **CI/CD Pipeline Monitoring**
+### 🚀 **Modulare Pipeline-Überwachung**
 
 #### **Pipeline Status Check Workflow:**
-1. **Nach jedem Push:** `gh run list` ausführen
-2. **Bei Fehlern:** Detaillierte Logs mit `gh run view <id> --log` prüfen
-3. **Reparatur:** Fehler beheben BEVOR weitere Entwicklung
-4. **Validierung:** Pipeline muss grün sein vor dem nächsten Feature
+1. **CI Phase:** `gh run list --workflow="CI Pipeline"` - Alle Tests müssen grün sein
+2. **Docker Phase:** `gh run list --workflow="Docker Build"` - Container müssen erfolgreich gebaut werden  
+3. **Deploy Phase:** `gh run list --workflow="Deploy"` - Production Deployment Success
+4. **Bei Fehlern:** `gh run view <id> --log` für detaillierte Analyse
+5. **Reparatur:** Fehler beheben BEVOR weitere Entwicklung
 
-#### **Häufige Pipeline-Fehler beheben:**
-- **ESLint Errors:** TypeScript `any` durch konkrete Typen ersetzen  
-- **Empty Interfaces:** Leere Interfaces entfernen oder erweitern
-- **Deprecated Actions:** GitHub Actions auf neueste Versionen aktualisieren
-- **YAML Syntax:** GitHub Actions Workflow-Dateien validieren
-
-### 📊 **Automatisierte Quality Gates**
-
-Das Projekt verwendet folgende automatisierte Prüfungen:
-
-1. **Backend Tests (Go):** 31 Tests müssen bestehen
-2. **Frontend Tests (React):** 36 Tests müssen bestehen  
-3. **E2E Tests (Playwright):** 85 Tests müssen bestehen
-4. **Security Scanning:** Trivy Vulnerability Scanner
-5. **Docker Build:** Multi-stage Builds für Backend + Frontend
-6. **Code Coverage:** Codecov Integration für Metriken
-
-**Ziel:** 152/153 Tests bestehen (99.3% Success Rate)
+#### **Vorteile der Modularen Architektur:**
+- **⚡ Schnellere Feedback:** CI läuft parallel (Frontend + Backend + E2E)
+- **🔧 Isolierte Debugging:** Separate Workflows für einfachere Fehlerdiagnose
+- **📈 Bessere Skalierung:** Docker Builds laufen nur bei CI Success
+- **🚀 Flexible Deployments:** Manuelle Triggers für Emergency Deployments
+- **💾 Optimierte Caches:** Separate Cache-Scopes für Backend/Frontend Docker Builds
 
 ### ⚡ **Schnelle Problemlösung**
 

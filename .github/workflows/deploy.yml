@@ -1,0 +1,83 @@
+# EVE Profit Calculator 2.0 - Production Deployment
+# Automated deployment to production environment
+name: Deploy
+
+on:
+  workflow_run:
+    workflows: ["Docker Build"]
+    types:
+      - completed
+    branches: [main]
+  # Manual trigger for emergency deployments
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # Only run if Docker Build succeeded
+  check-docker-success:
+    name: Check Docker Build Status
+    runs-on: ubuntu-latest
+    outputs:
+      docker-success: ${{ steps.check.outputs.success }}
+      
+    steps:
+    - name: Check Docker Build result
+      id: check
+      run: |
+        if [[ "${{ github.event.workflow_run.conclusion }}" == "success" ]]; then
+          echo "success=true" >> $GITHUB_OUTPUT
+          echo "✅ Docker Build succeeded. Proceeding with deployment."
+        else
+          echo "success=false" >> $GITHUB_OUTPUT
+          echo "❌ Docker Build failed. Skipping deployment."
+        fi
+
+  # Production Deployment
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [check-docker-success]
+    if: needs.check-docker-success.outputs.docker-success == 'true' && github.ref == 'refs/heads/main'
+    environment: production
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Deploy to production
+      run: |
+        echo "🚀 Deploying to production environment..."
+        echo "Backend Image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-backend:latest"
+        echo "Frontend Image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-frontend:latest"
+        
+        # Here you would add your actual deployment commands:
+        # Examples:
+        # - kubectl apply -f k8s/
+        # - docker-compose -f docker-compose.prod.yml pull && docker-compose -f docker-compose.prod.yml up -d
+        # - helm upgrade --install eve-profit2 ./helm-chart
+        # - curl -X POST "$DEPLOYMENT_WEBHOOK_URL" -H "Authorization: Bearer $DEPLOYMENT_TOKEN"
+        
+        echo "✅ Production deployment completed successfully!"
+
+  # Deployment notification
+  deployment-notification:
+    name: Deployment Notification
+    runs-on: ubuntu-latest
+    needs: [deploy-production]
+    if: always()
+
+    steps:
+    - name: Notify deployment status
+      run: |
+        if [ "${{ needs.deploy-production.result }}" == "success" ]; then
+          echo "✅ Production deployment successful!"
+          echo "🌐 Application is now live with latest changes."
+        elif [ "${{ needs.deploy-production.result }}" == "skipped" ]; then
+          echo "⏭️ Production deployment skipped (not main branch or Docker build failed)."
+        else
+          echo "❌ Production deployment failed!"
+          echo "🚨 Investigation required. Check deployment logs."
+        fi

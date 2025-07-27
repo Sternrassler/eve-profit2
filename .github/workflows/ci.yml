@@ -1,17 +1,12 @@
-# EVE Profit Calculator 2.0 - CI/CD Pipeline
-# Comprehensive testing, building, and deployment automation
-
-name: CI/CD Pipeline
+# EVE Profit Calculator 2.0 - Continuous Integration
+# Fast feedback loop for code quality and testing
+name: CI Pipeline
 
 on:
   push:
     branches: [ main, develop ]
   pull_request:
     branches: [ main ]
-
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   # Backend Testing
@@ -29,7 +24,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
-        go-version: '1.21'
+        go-version: '1.23'
 
     - name: Cache Go modules
       uses: actions/cache@v3
@@ -123,7 +118,7 @@ jobs:
     - name: Set up Go (for backend)
       uses: actions/setup-go@v4
       with:
-        go-version: '1.21'
+        go-version: '1.23'
 
     - name: Download SDE database for E2E tests
       run: |
@@ -188,86 +183,23 @@ jobs:
       with:
         sarif_file: 'trivy-results.sarif'
 
-  # Docker Build
-  docker-build:
-    name: Docker Build & Push
+  # CI Success Notification
+  ci-success:
+    name: CI Success
     runs-on: ubuntu-latest
-    needs: [backend-test, frontend-test, e2e-test]
-    permissions:
-      contents: read
-      packages: write
-
-    strategy:
-      matrix:
-        component: [backend, frontend]
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-
-    - name: Log in to Container Registry
-      uses: docker/login-action@v3
-      with:
-        registry: ${{ env.REGISTRY }}
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Extract metadata
-      id: meta
-      uses: docker/metadata-action@v5
-      with:
-        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ matrix.component }}
-        tags: |
-          type=ref,event=branch
-          type=ref,event=pr
-          type=sha,prefix={{branch}}-
-          type=raw,value=latest,enable={{is_default_branch}}
-
-    - name: Build and push Docker image
-      uses: docker/build-push-action@v5
-      with:
-        context: ./${{ matrix.component }}
-        push: true
-        tags: ${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
-
-  # Deployment (Production)
-  deploy-production:
-    name: Deploy to Production
-    runs-on: ubuntu-latest
-    needs: [docker-build, security-scan]
-    if: github.ref == 'refs/heads/main'
-    environment: production
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Deploy to production
-      run: |
-        echo "🚀 Deployment to production would happen here"
-        echo "Using images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-backend:latest"
-        echo "Using images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-frontend:latest"
-        # Here you would add your actual deployment commands
-        # For example: kubectl apply, docker-compose pull && docker-compose up, etc.
-
-  # Deployment notification
-  deployment-notification:
-    name: Deployment Notification
-    runs-on: ubuntu-latest
-    needs: [deploy-production]
+    needs: [backend-test, frontend-test, e2e-test, security-scan]
     if: always()
 
     steps:
-    - name: Notify deployment status
+    - name: Report CI status
       run: |
-        if [ "${{ needs.deploy-production.result }}" == "success" ]; then
-          echo "✅ Deployment successful!"
+        if [ "${{ needs.backend-test.result }}" == "success" ] && \
+           [ "${{ needs.frontend-test.result }}" == "success" ] && \
+           [ "${{ needs.e2e-test.result }}" == "success" ] && \
+           [ "${{ needs.security-scan.result }}" == "success" ]; then
+          echo "✅ All CI checks passed! Ready for Docker build."
+          exit 0
         else
-          echo "❌ Deployment failed!"
+          echo "❌ CI checks failed. Check individual job results."
+          exit 1
         fi
