@@ -23,7 +23,7 @@ COPY pkg/ pkg/
 
 # Create data directory and download SDE during build
 RUN mkdir -p data && \
-    wget -O data/sqlite-latest.sqlite \
+    wget -O data/sqlite-latest.sqlite.bz2 \
     "https://www.fuzzwork.co.uk/dump/sqlite-latest.sqlite.bz2" && \
     bzip2 -d data/sqlite-latest.sqlite.bz2
 
